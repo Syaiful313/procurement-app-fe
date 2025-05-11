@@ -1,3 +1,5 @@
+import { Procurement } from "./procurement";
+
 export interface User {
   id: string;
   nik: string;
@@ -7,4 +9,5 @@ export interface User {
   password: string;
   createdAt: string;
   updatedAt: string;
+  procurements: Procurement[];
 }
