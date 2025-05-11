@@ -31,7 +31,7 @@ import {
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbPage className="text-primary text-base font-medium">
-                  Events
+                  Pengadaan barang
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>

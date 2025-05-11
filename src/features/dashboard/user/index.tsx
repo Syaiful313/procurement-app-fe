@@ -1,6 +1,6 @@
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebarUser } from "./components/AppSidebarUser";
-import DashboardHomePage from "./components/DashboardUser";
+import { ProcurementsTable } from "./components/ProcurementsTable";
 import { SiteHeaderUser } from "./components/SiteHeaderUser";
 
 export default function DashboardUserPage() {
@@ -9,14 +9,15 @@ export default function DashboardUserPage() {
       <AppSidebarUser variant="inset" />
       <SidebarInset>
         <SiteHeaderUser />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <div className="px-4 lg:px-6">
-              <DashboardHomePage/>
-              </div>
-            </div>
+        <div className="container mx-auto px-4 py-6">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold">Pengadaan barang</h1>
+            <p className="text-muted-foreground mt-1">
+              Halaman ini menampilkan semua pengadaan barang yang telah Anda
+              buat. Anda dapat mengelola pengadaan barang Anda di sini.
+            </p>
           </div>
+          <ProcurementsTable />
         </div>
       </SidebarInset>
     </SidebarProvider>
