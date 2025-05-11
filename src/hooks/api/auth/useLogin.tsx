@@ -26,6 +26,8 @@ const useLogin = () => {
         router.push("/dashboard/dirops");
       } else if (data.role === "USER") {
         router.push("/dashboard/user");
+      } else if (data.role === "MANAGER") {
+        router.push("/dashboard/manager");
       }
     },
     onError: (error: AxiosError<any>) => {

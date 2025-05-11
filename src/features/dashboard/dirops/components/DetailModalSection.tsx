@@ -1,27 +1,18 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-  DialogDescription,
+  DialogTitle
 } from "@/components/ui/dialog";
 import useGetProcurementById from "@/hooks/api/dashboard-dirops/useGetProcurementById";
-import useUpdateProcurementStatus from "@/hooks/api/dashboard-dirops/useUpdateProcurementStatus";
 import { ProcurementStatus } from "@/types/procurement";
 import {
-  ChevronDownIcon,
-  ColumnsIcon,
-  Eye,
-  MoreVerticalIcon,
-  CheckCircle2,
   AlertTriangle,
-  XCircle,
+  CheckCircle2,
   Clock,
-  CheckSquare,
   Loader2,
+  XCircle
 } from "lucide-react";
 
 const ModalDetailSection = ({
@@ -135,7 +126,7 @@ const ModalDetailSection = ({
 
             <div className="space-y-6 py-4">
               <div>
-                <h3 className="font-semibold text-lg">Deskripsi</h3>
+                <h3 className="font-semibold text-lg">Keterangan</h3>
                 <p className="mt-2 text-muted-foreground">
                   {procurement.description}
                 </p>
@@ -162,7 +153,6 @@ const ModalDetailSection = ({
                   </h4>
                   <p>{formatDate(procurement.createdAt)}</p>
                 </div>
-                
               </div>
             </div>
           </>
