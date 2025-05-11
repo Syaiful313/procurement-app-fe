@@ -1,3 +1,5 @@
+import { User } from "./user";
+
 export type ProcurementStatus =
   | "WAITING_CONFIRMATION"
   | "PRIORITAS"
@@ -12,4 +14,5 @@ export interface Procurement {
   status: ProcurementStatus;
   createdAt: string;
   updatedAt: string;
+  user: User
 }

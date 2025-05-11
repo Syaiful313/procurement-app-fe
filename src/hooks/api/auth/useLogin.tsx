@@ -22,7 +22,11 @@ const useLogin = () => {
       toast.success("Login successful");
       dispatch(loginAction(data));
       localStorage.setItem("token", JSON.stringify(data));
-      router.push("/dashboard/user");
+      if (data.role === "DIROPS") {
+        router.push("/dashboard/dirops");
+      } else if (data.role === "USER") {
+        router.push("/dashboard/user");
+      }
     },
     onError: (error: AxiosError<any>) => {
       toast.error(error.response?.data.message || "Login failed");
