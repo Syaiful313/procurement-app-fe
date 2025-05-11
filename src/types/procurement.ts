@@ -12,6 +12,7 @@ export interface Procurement {
   username: string;
   description: string;
   status: ProcurementStatus;
+  note: string;
   createdAt: string;
   updatedAt: string;
   user: User

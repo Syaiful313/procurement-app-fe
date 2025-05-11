@@ -28,6 +28,8 @@ const useLogin = () => {
         router.push("/dashboard/user");
       } else if (data.role === "MANAGER") {
         router.push("/dashboard/manager");
+      } else if (data.role === "PROCUREMENT") {
+        router.push("/dashboard/procurement");
       }
     },
     onError: (error: AxiosError<any>) => {
