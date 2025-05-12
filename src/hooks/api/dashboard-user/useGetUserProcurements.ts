@@ -1,6 +1,5 @@
 "use client";
 import useAxios from "@/hooks/useAxios";
-import { useAppSelector } from "@/redux/hooks";
 import { PageableResponse, PaginationQueries } from "@/types/Pagination";
 import { Procurement } from "@/types/procurement";
 import { useQuery } from "@tanstack/react-query";
@@ -12,7 +11,6 @@ interface GetUserProcurementsQuery extends PaginationQueries {
 
 const useGetUserProcurements = (queries?: GetUserProcurementsQuery) => {
   const { axiosInstance } = useAxios();
-  const { token } = useAppSelector((state) => state.user);
 
   return useQuery({
     queryKey: ["user-procurements", queries],
@@ -25,8 +23,7 @@ const useGetUserProcurements = (queries?: GetUserProcurementsQuery) => {
       );
       return data;
     },
-    enabled: !!token, // Query hanya dijalankan jika token tersedia
-    retry: 1, // Coba lagi sekali jika gagal
+    retry: 1,
   });
 };
 
