@@ -38,7 +38,7 @@ const data = {
       icon: LayoutDashboardIcon,
     },
     {
-      title: "List Users",
+      title: "Daftar Pengguna",
       url: "/dashboard/procurement/users",
       icon: User,
     },
@@ -125,7 +125,7 @@ export function AppSidebarProcurement({
             >
               <Link href="/">
                 <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">Procurement App</span>
+                <span className="text-base font-semibold">Sabar App</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

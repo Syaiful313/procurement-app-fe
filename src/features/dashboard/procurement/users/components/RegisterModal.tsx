@@ -23,25 +23,7 @@ import useRegister from "@/hooks/api/auth/useRegister";
 import { useFormik } from "formik";
 import { Eye, EyeOff, Plus } from "lucide-react";
 import { useState } from "react";
-import * as Yup from "yup";
-
-const registerSchema = Yup.object({
-  username: Yup.string()
-    .min(3, "Username harus memiliki minimal 3 karakter")
-    .required("Username wajib diisi"),
-  email: Yup.string()
-    .email("Email tidak valid")
-    .required("Email wajib diisi"),
-  password: Yup.string()
-    .min(6, "Password harus memiliki minimal 6 karakter")
-    .required("Password wajib diisi"),
-  nik: Yup.string()
-    .matches(/^\d{5}$/, "NIK harus 5 digit angka")
-    .required("NIK wajib diisi"),
-  role: Yup.string()
-    .oneOf(["USER", "MANAGER", "DIROPS", "PROCUREMENT"], "Role tidak valid")
-    .required("Role wajib dipilih"),
-});
+import { registerSchema } from "./schemas";
 
 interface RegisterModalProps {
   onSuccess?: () => void;
@@ -62,17 +44,7 @@ export default function RegisterModal({ onSuccess }: RegisterModalProps) {
     },
     validationSchema: registerSchema,
     onSubmit: async (values) => {
-      try {
-        await register(values);
-        formik.resetForm();
-        setOpen(false);
-        if (onSuccess) {
-          onSuccess();
-        }
-      } catch (error) {
-        // Error handling already managed by the hook
-        console.error("Registration error:", error);
-      }
+      await register(values);
     },
   });
 
@@ -89,25 +61,25 @@ export default function RegisterModal({ onSuccess }: RegisterModalProps) {
       <DialogTrigger asChild>
         <Button className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
-          Tambah User
+          Tambah Pengguna
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Tambah User Baru</DialogTitle>
+          <DialogTitle>Tambah Pengguna Baru</DialogTitle>
           <DialogDescription>
-            Daftarkan pengguna baru untuk mengakses sistem procurement
+            Daftarkan pengguna baru untuk mengakses sistem pengadaan
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={formik.handleSubmit}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">Nama Pengguna</Label>
               <Input
                 id="username"
                 name="username"
                 type="text"
-                placeholder="Username"
+                placeholder="Nama pengguna"
                 value={formik.values.username}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -124,7 +96,7 @@ export default function RegisterModal({ onSuccess }: RegisterModalProps) {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="email@example.com"
+                placeholder="email@contoh.com"
                 value={formik.values.email}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -153,13 +125,13 @@ export default function RegisterModal({ onSuccess }: RegisterModalProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Kata Sandi</Label>
               <div className="relative">
                 <Input
                   name="password"
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Masukkan password"
+                  placeholder="Masukkan kata sandi"
                   value={formik.values.password}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -184,20 +156,20 @@ export default function RegisterModal({ onSuccess }: RegisterModalProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
+              <Label htmlFor="role">Peran</Label>
               <Select
                 name="role"
                 value={formik.values.role}
                 onValueChange={(value) => formik.setFieldValue("role", value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih Role" />
+                  <SelectValue placeholder="Pilih Peran" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="USER">User</SelectItem>
-                  <SelectItem value="MANAGER">Manager</SelectItem>
+                  <SelectItem value="USER">Pengguna</SelectItem>
+                  <SelectItem value="MANAGER">Manajer</SelectItem>
                   <SelectItem value="DIROPS">Dirops</SelectItem>
-                  <SelectItem value="PROCUREMENT">Procurement</SelectItem>
+                  <SelectItem value="PROCUREMENT">Pengadaan</SelectItem>
                 </SelectContent>
               </Select>
               {formik.touched.role && formik.errors.role && (
@@ -207,7 +179,7 @@ export default function RegisterModal({ onSuccess }: RegisterModalProps) {
           </div>
           <DialogFooter>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Menambahkan..." : "Tambah User"}
+              {isPending ? "Menyimpan..." : "Tambah Pengguna"}
             </Button>
           </DialogFooter>
         </form>

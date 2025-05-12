@@ -20,7 +20,6 @@ import {
   FileIcon,
   FileTextIcon,
   LayoutDashboardIcon,
-  Package,
 } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
@@ -120,7 +119,7 @@ export function AppSidebarManager({
             >
               <Link href="/">
                 <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">Procurement App</span>
+                <span className="text-base font-semibold">Sabar App</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

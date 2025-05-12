@@ -13,6 +13,8 @@ export interface Procurement {
   description: string;
   status: ProcurementStatus;
   note: string;
+  date: string;
+  department: "PURCHASE" | "FACTORY" | "OFFICE";
   createdAt: string;
   updatedAt: string;
   user: User

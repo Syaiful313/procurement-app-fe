@@ -1,5 +1,6 @@
 "use client";
 
+import { NavMain } from "@/components/NavMain";
 import { NavUser } from "@/components/NavUser";
 import {
   Sidebar,
@@ -23,7 +24,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
-import { NavMain } from "./NavMain";
 
 const data = {
   user: {
@@ -125,7 +125,7 @@ export function AppSidebarUser({
             >
               <Link href="/">
                 <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">Procurement App</span>
+                <span className="text-base font-semibold">Sabar App</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

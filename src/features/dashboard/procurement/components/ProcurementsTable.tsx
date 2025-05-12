@@ -18,7 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import useGetProcurements from "@/hooks/api/dashboard-dirops/useGetProcurements";
 import { Procurement } from "@/types/procurement";
 import {
@@ -55,20 +54,23 @@ import ModalDetailSectionProcurement from "./ModalDetailProcurementSection";
 const STATUS_CONFIG = {
   WAITING_CONFIRMATION: {
     color: "bg-amber-50 text-amber-700 border-amber-200",
-    label: "Waiting Confirmation",
+    label: "Menunggu Konfirmasi",
   },
   PRIORITAS: {
     color: "bg-orange-50 text-orange-700 border-orange-200",
     label: "Prioritas",
   },
-  URGENT: { color: "bg-red-50 text-red-700 border-red-200", label: "Urgent" },
+  URGENT: { 
+    color: "bg-red-50 text-red-700 border-red-200", 
+    label: "Mendesak" 
+  },
   COMPLEMENT: {
     color: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    label: "Complement",
+    label: "Melengkapi",
   },
   REJECTED: {
     color: "bg-gray-50 text-gray-700 border-gray-200",
-    label: "Rejected",
+    label: "Ditolak",
   },
 };
 
@@ -89,21 +91,20 @@ function DraggableRow({ row }: { row: Row<Procurement> }) {
       }}
     >
       {row.getVisibleCells().map((cell) => {
-        let cellClass = "py-1 sm:py-3 px-0.5 sm:px-4";
+        let cellClass = "py-3 sm:py-3 px-2 sm:px-4";
 
-        // Mobile-first responsive classes
         if (cell.column.id === "index") 
-          cellClass += " w-8 sm:w-16 text-[10px] sm:text-sm text-center";
+          cellClass += " w-10 sm:w-16 text-sm sm:text-sm text-center";
         else if (cell.column.id === "username") 
-          cellClass += " min-w-[60px] sm:w-32 text-[10px] sm:text-sm font-medium";
+          cellClass += " min-w-[80px] sm:w-32 text-sm sm:text-sm font-medium";
         else if (cell.column.id === "description") 
-          cellClass += " min-w-[100px] sm:w-auto text-[10px] sm:text-sm";
+          cellClass += " min-w-[120px] sm:w-auto text-sm sm:text-sm";
         else if (cell.column.id === "status") 
-          cellClass += " min-w-[60px] sm:w-40 text-center";
+          cellClass += " min-w-[80px] sm:w-40 text-center";
         else if (cell.column.id === "createdAt") 
-          cellClass += " min-w-[70px] sm:w-40 text-[10px] sm:text-sm text-center";
+          cellClass += " min-w-[80px] sm:w-40 text-sm sm:text-sm text-center";
         else if (cell.column.id === "actions") 
-          cellClass += " w-10 sm:w-24 text-center";
+          cellClass += " w-12 sm:w-24 text-center";
 
         return (
           <TableCell key={cell.id} className={cellClass}>
@@ -149,7 +150,6 @@ export function ProcurementsTable() {
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
-    // Shorter format for mobile
     const isMobile = window.innerWidth < 640;
     return date.toLocaleDateString("id-ID", {
       day: "numeric",
@@ -164,19 +164,18 @@ export function ProcurementsTable() {
       label: status.replace(/_/g, " "),
     };
 
-    // Shorter labels for mobile
     const mobileLabel = {
-      WAITING_CONFIRMATION: "Waiting",
+      WAITING_CONFIRMATION: "Menunggu",
       PRIORITAS: "Prioritas",
-      URGENT: "Urgent",
-      COMPLEMENT: "Complement",
-      REJECTED: "Rejected",
+      URGENT: "Mendesak",
+      COMPLEMENT: "Melengkapi",
+      REJECTED: "Ditolak",
     }[status] || config.label;
 
     return (
       <Badge
         variant="outline"
-        className={`px-1 sm:px-3 py-0 sm:py-1 font-medium text-[8px] sm:text-xs whitespace-nowrap ${config.color}`}
+        className={`px-2 sm:px-3 py-1 sm:py-1 font-medium text-xs sm:text-xs whitespace-nowrap ${config.color}`}
       >
         <span className="hidden sm:inline">{config.label}</span>
         <span className="sm:hidden">{mobileLabel}</span>
@@ -188,12 +187,12 @@ export function ProcurementsTable() {
     {
       accessorKey: "index",
       header: () => (
-        <div className="text-center text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
+        <div className="text-center text-xs sm:text-xs font-semibold uppercase tracking-wider">
           No
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-center text-[10px] sm:text-sm">{row.index + 1}</div>
+        <div className="text-center text-sm sm:text-sm">{row.index + 1}</div>
       ),
       enableHiding: false,
       size: 40,
@@ -201,12 +200,12 @@ export function ProcurementsTable() {
     {
       accessorKey: "username",
       header: () => (
-        <div className="text-left text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
+        <div className="text-left text-xs sm:text-xs font-semibold uppercase tracking-wider">
           Nama
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-left font-medium text-[10px] sm:text-sm truncate" title={row.original.username}>
+        <div className="text-left font-medium text-sm sm:text-sm truncate" title={row.original.username}>
           {row.original.username}
         </div>
       ),
@@ -215,15 +214,14 @@ export function ProcurementsTable() {
     {
       accessorKey: "description",
       header: () => (
-        <div className="text-left text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
-          <span className="hidden sm:inline">Keterangan</span>
-          <span className="sm:hidden">Ktrg</span>
+        <div className="text-left text-xs sm:text-xs font-semibold uppercase tracking-wider">
+          <span>Keterangan</span>
         </div>
       ),
       cell: ({ row }) => (
         <div 
-          className="text-left text-[10px] sm:text-sm text-gray-600 truncate"
-          style={{ maxWidth: '100px' }}
+          className="text-left text-sm sm:text-sm text-gray-600 truncate"
+          style={{ maxWidth: '120px' }}
           title={row.original.description}
         >
           {row.original.description}
@@ -234,7 +232,7 @@ export function ProcurementsTable() {
     {
       accessorKey: "status",
       header: () => (
-        <div className="text-center text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
+        <div className="text-center text-xs sm:text-xs font-semibold uppercase tracking-wider">
           Status
         </div>
       ),
@@ -248,13 +246,12 @@ export function ProcurementsTable() {
     {
       accessorKey: "createdAt",
       header: () => (
-        <div className="text-center text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
-          <span className="hidden sm:inline">Tanggal</span>
-          <span className="sm:hidden">Tgl</span>
+        <div className="text-center text-xs sm:text-xs font-semibold uppercase tracking-wider">
+          <span>Tanggal</span>
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-center text-[10px] sm:text-sm text-gray-600">
+        <div className="text-center text-sm sm:text-sm text-gray-600">
           {formatDate(row.original.createdAt)}
         </div>
       ),
@@ -263,21 +260,20 @@ export function ProcurementsTable() {
     {
       id: "actions",
       header: () => (
-        <div className="text-center text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
-          <span className="hidden sm:inline">Actions</span>
-          <span className="sm:hidden">Act</span>
+        <div className="text-center text-xs sm:text-xs font-semibold uppercase tracking-wider">
+          Aksi
         </div>
       ),
       cell: ({ row }) => (
         <div className="flex justify-center">
           <Button
             variant="ghost"
-            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-0 sm:p-1 rounded-full h-6 w-6 sm:h-8 sm:w-8"
+            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-1 sm:p-1 rounded-full h-8 w-8 sm:h-8 sm:w-8"
             size="icon"
             onClick={() => handleViewDetails(row.original.id)}
           >
-            <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="sr-only">View details</span>
+            <Eye className="h-4 w-4 sm:h-4 sm:w-4" />
+            <span className="sr-only">Lihat detail</span>
           </Button>
         </div>
       ),
@@ -334,9 +330,8 @@ export function ProcurementsTable() {
   }
 
   return (
-    <div className="space-y-3 sm:space-y-4 max-w-full">
-      {/* Search and Filter Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 sm:gap-3">
+    <div className="space-y-4 sm:space-y-4 max-w-full">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-3">
         <div className="flex-1 max-w-full lg:max-w-md">
           <Input
             placeholder="Cari pengadaan..."
@@ -345,7 +340,7 @@ export function ProcurementsTable() {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full text-sm"
+            className="w-full text-sm h-10"
           />
         </div>
         <div className="flex gap-2">
@@ -354,16 +349,16 @@ export function ProcurementsTable() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="flex items-center text-xs md:text-sm h-9 sm:h-9 px-2 sm:px-3"
+                className="flex items-center text-sm md:text-sm h-10 sm:h-9 px-3 sm:px-3"
               >
-                <FilterIcon className="h-3.5 w-3.5 mr-1" />
+                <FilterIcon className="h-4 w-4 mr-1.5" />
                 <span className="truncate">
                   {statusFilter
                     ? STATUS_CONFIG[statusFilter as keyof typeof STATUS_CONFIG]
                         ?.label || statusFilter.replace(/_/g, " ")
                     : "Status"}
                 </span>
-                <ChevronDownIcon className="ml-1 h-3.5 w-3.5" />
+                <ChevronDownIcon className="ml-1.5 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
@@ -372,9 +367,9 @@ export function ProcurementsTable() {
                   setStatusFilter("");
                   setCurrentPage(1);
                 }}
-                className="cursor-pointer"
+                className="cursor-pointer text-sm"
               >
-                All Status
+                Semua Status
               </DropdownMenuItem>
               {Object.entries(STATUS_CONFIG).map(([status, config]) => (
                 <DropdownMenuItem
@@ -383,7 +378,7 @@ export function ProcurementsTable() {
                     setStatusFilter(status);
                     setCurrentPage(1);
                   }}
-                  className="flex items-center cursor-pointer"
+                  className="flex items-center cursor-pointer text-sm"
                 >
                   <div
                     className={`w-2 h-2 rounded-full mr-2 ${
@@ -401,10 +396,10 @@ export function ProcurementsTable() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="text-xs md:text-sm h-9 sm:h-9 px-2 sm:px-3"
+                className="text-sm md:text-sm h-10 sm:h-9 px-3 sm:px-3"
               >
-                <span>Cols</span>
-                <ChevronDownIcon className="ml-1 h-3.5 w-3.5" />
+                <span>Kolom</span>
+                <ChevronDownIcon className="ml-1.5 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
@@ -418,13 +413,18 @@ export function ProcurementsTable() {
                 .map((column) => (
                   <DropdownMenuCheckboxItem
                     key={column.id}
-                    className="capitalize cursor-pointer"
+                    className="capitalize cursor-pointer text-sm"
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) =>
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {column.id === "index" ? "No." : column.id}
+                    {column.id === "index" ? "No." : 
+                     column.id === "username" ? "Nama" :
+                     column.id === "description" ? "Keterangan" :
+                     column.id === "status" ? "Status" :
+                     column.id === "createdAt" ? "Tanggal" :
+                     column.id}
                   </DropdownMenuCheckboxItem>
                 ))}
             </DropdownMenuContent>
@@ -432,7 +432,6 @@ export function ProcurementsTable() {
         </div>
       </div>
 
-      {/* Table */}
       <div className="rounded-lg border border-gray-200 shadow-sm overflow-hidden bg-white w-full">
         <DndContext
           collisionDetection={closestCenter}
@@ -442,7 +441,7 @@ export function ProcurementsTable() {
           id={sortableId}
         >
           <div className="w-full overflow-x-auto" style={{ minHeight: "400px" }}>
-            <Table className="w-full min-w-[450px] table-fixed">
+            <Table className="w-full min-w-[540px] table-fixed">
               <TableHeader className="bg-gray-50">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow
@@ -450,14 +449,14 @@ export function ProcurementsTable() {
                     className="border-b border-gray-200"
                   >
                     {headerGroup.headers.map((header) => {
-                      let headerClass = "h-7 sm:h-10 px-0.5 sm:px-4 text-gray-700";
+                      let headerClass = "h-10 sm:h-10 px-2 sm:px-4 text-gray-700";
                       
-                      if (header.id === "index") headerClass += " w-8 sm:w-16";
-                      else if (header.id === "username") headerClass += " min-w-[60px] sm:w-32";
-                      else if (header.id === "description") headerClass += " min-w-[100px] sm:w-auto";
-                      else if (header.id === "status") headerClass += " min-w-[60px] sm:w-40";
-                      else if (header.id === "createdAt") headerClass += " min-w-[70px] sm:w-40";
-                      else if (header.id === "actions") headerClass += " w-10 sm:w-24";
+                      if (header.id === "index") headerClass += " w-10 sm:w-16";
+                      else if (header.id === "username") headerClass += " min-w-[80px] sm:w-32";
+                      else if (header.id === "description") headerClass += " min-w-[120px] sm:w-auto";
+                      else if (header.id === "status") headerClass += " min-w-[80px] sm:w-40";
+                      else if (header.id === "createdAt") headerClass += " min-w-[80px] sm:w-40";
+                      else if (header.id === "actions") headerClass += " w-12 sm:w-24";
 
                       return (
                         <TableHead
@@ -485,8 +484,8 @@ export function ProcurementsTable() {
                       className="h-24 text-center"
                     >
                       <div className="flex justify-center items-center">
-                        <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-t-blue-500 rounded-full animate-spin"></div>
-                        <span className="ml-2 text-xs sm:text-sm text-gray-500">Loading...</span>
+                        <div className="w-6 h-6 sm:w-6 sm:h-6 border-2 border-t-blue-500 rounded-full animate-spin"></div>
+                        <span className="ml-2 text-sm sm:text-sm text-gray-500">Memuat...</span>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -496,9 +495,9 @@ export function ProcurementsTable() {
                       colSpan={columns.length}
                       className="h-24 text-center text-red-500"
                     >
-                      <div className="flex flex-col items-center gap-1">
-                        <span className="text-sm">Error loading data</span>
-                        <span className="text-xs sm:text-sm text-red-400">
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-sm">Kesalahan memuat data</span>
+                        <span className="text-sm sm:text-sm text-red-400">
                           {error.message}
                         </span>
                       </div>
@@ -531,7 +530,7 @@ export function ProcurementsTable() {
         </DndContext>
 
         {procurementsData?.meta && (
-          <div className="border-t border-gray-200 bg-gray-50 py-2 sm:py-3 px-2 sm:px-4">
+          <div className="border-t border-gray-200 bg-gray-50 py-3 sm:py-3 px-3 sm:px-4">
             <PaginationSection
               page={procurementsData.meta.page}
               take={procurementsData.meta.take}

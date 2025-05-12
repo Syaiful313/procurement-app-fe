@@ -42,7 +42,7 @@ export default function LoginPage() {
           <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-md sm:h-10 sm:w-10">
             <Package className="h-5 w-5 text-white sm:h-6 sm:w-6" />
           </div>
-          <h1 className="text-xl font-bold sm:text-2xl">Procurement App</h1>
+          <h1 className="text-xl font-bold sm:text-2xl">Sabar App</h1>
         </Link>
       </div>
 
@@ -79,7 +79,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" className="text-sm sm:text-base">
-                  Password
+                  Kata Sandi
                 </Label>
               </div>
               <div className="relative">
@@ -87,7 +87,7 @@ export default function LoginPage() {
                   name="password"
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Masukkan password"
+                  placeholder="Masukkan kata sandi anda"
                   value={formik.values.password}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}

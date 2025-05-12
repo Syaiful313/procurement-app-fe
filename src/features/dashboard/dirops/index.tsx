@@ -1,7 +1,7 @@
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebarUser } from "./components/AppSidebarDirops";
+import { ProcurementsDiropsTable } from "./components/ProcurementsDiropsTable";
 import { SiteHeaderDirops } from "./components/SiteHeaderDirops";
-import { ProcurementsTable } from "./components/ProcurementsTable";
 
 export default function DashboardDiropsPage() {
   return (
@@ -17,7 +17,7 @@ export default function DashboardDiropsPage() {
               buat. Anda dapat mengelola pengadaan barang karyawan di sini.
             </p>
           </div>
-          <ProcurementsTable />
+          <ProcurementsDiropsTable />
         </div>
       </SidebarInset>
     </SidebarProvider>
