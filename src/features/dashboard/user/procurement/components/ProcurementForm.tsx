@@ -3,10 +3,17 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 import { useFormik } from "formik";
 import { useState } from "react";
 import useCreateProcurement from "@/hooks/api/dashboard-user/useCreateprocurement";
 import { CreateProcurementSchema } from "./schemas";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 const ProcurementForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,6 +23,8 @@ const ProcurementForm = () => {
     initialValues: {
       username: "",
       description: "",
+      date: new Date(),
+      department: "" as "" | "PURCHASE" | "FACTORY" | "OFFICE",
     },
     validationSchema: CreateProcurementSchema,
     onSubmit: async (values) => {
@@ -24,6 +33,8 @@ const ProcurementForm = () => {
         await createProcurement.mutate({
           username: values.username,
           description: values.description,
+          date: values.date,
+          department: values.department as "PURCHASE" | "FACTORY" | "OFFICE",
         });
       } finally {
         setIsSubmitting(false);
@@ -46,10 +57,9 @@ const ProcurementForm = () => {
       </div>
 
       <div className="space-y-6">
-        {/* Field Nama */}
         <div className="grid gap-3">
           <Label htmlFor="username" className="font-medium">
-            Name
+            Nama
           </Label>
           <Input
             id="username"
@@ -70,12 +80,12 @@ const ProcurementForm = () => {
 
         <div className="grid gap-3">
           <Label htmlFor="description" className="font-medium">
-            Description
+            Keterangan
           </Label>
           <Textarea
             id="description"
             name="description"
-            placeholder="Masukkan deskripsi"
+            placeholder="Masukkan keterangan"
             value={formik.values.description}
             required
             onChange={formik.handleChange}
@@ -86,6 +96,73 @@ const ProcurementForm = () => {
           {!!formik.touched.description && !!formik.errors.description && (
             <p className="text-destructive text-sm">
               {formik.errors.description}
+            </p>
+          )}
+        </div>
+
+        <div className="grid gap-3">
+          <Label htmlFor="date" className="font-medium">
+            Tanggal
+          </Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !formik.values.date && "text-muted-foreground"
+                )}
+                type="button"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {formik.values.date ? (
+                  format(formik.values.date, "PPP")
+                ) : (
+                  <span>Pilih tanggal</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={formik.values.date}
+                onSelect={(date) => {
+                  if (date) {
+                    formik.setFieldValue("date", date);
+                  }
+                }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          {!!formik.touched.date && !!formik.errors.date && (
+            <p className="text-destructive text-sm">
+              {formik.errors.date as string}
+            </p>
+          )}
+        </div>
+
+        <div className="grid gap-3">
+          <Label htmlFor="department" className="font-medium">
+            Department
+          </Label>
+          <Select
+            value={formik.values.department}
+            onValueChange={(value) => formik.setFieldValue("department", value)}
+            disabled={isSubmitting}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Pilih department" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="PURCHASE">Pembelian</SelectItem>
+              <SelectItem value="FACTORY">Pabrik</SelectItem>
+              <SelectItem value="OFFICE">Kantor</SelectItem>
+            </SelectContent>
+          </Select>
+          {!!formik.touched.department && !!formik.errors.department && (
+            <p className="text-destructive text-sm">
+              {formik.errors.department}
             </p>
           )}
         </div>

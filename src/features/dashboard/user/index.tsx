@@ -1,6 +1,6 @@
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { ProcurementsUserTable } from "@/features/dashboard/user/components/ProcurementsUserTable";
 import { AppSidebarUser } from "./components/AppSidebarUser";
-import { ProcurementsTable } from "./components/ProcurementsTable";
 import { SiteHeaderUser } from "./components/SiteHeaderUser";
 
 export default function DashboardUserPage() {
@@ -17,7 +17,7 @@ export default function DashboardUserPage() {
               buat. Anda dapat mengelola pengadaan barang Anda di sini.
             </p>
           </div>
-          <ProcurementsTable />
+          <ProcurementsUserTable />
         </div>
       </SidebarInset>
     </SidebarProvider>
