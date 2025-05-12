@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import useGetProcurementById from "@/hooks/api/dashboard-dirops/useGetProcurementById";
 import useUpdateProcurementStatus from "@/hooks/api/dashboard-dirops/useUpdateProcurementStatus";
-import useUpdateProcurementNote from "@/hooks/api/auth/dashboard-procurement/useUpdateProcurementNote";
+import useUpdateProcurementNote from "@/hooks/api/dashboard-procurement/useUpdateProcurementNote";
 import { ProcurementStatus } from "@/types/procurement";
 import { useEffect, useState } from "react";
 import { Loader2, Save } from "lucide-react";

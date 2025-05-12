@@ -89,14 +89,21 @@ function DraggableRow({ row }: { row: Row<Procurement> }) {
       }}
     >
       {row.getVisibleCells().map((cell) => {
-        let cellClass = "py-3";
+        let cellClass = "py-1 sm:py-3 px-0.5 sm:px-4";
 
-        if (cell.column.id === "index") cellClass += " w-16";
-        else if (cell.column.id === "username") cellClass += " w-32";
-        else if (cell.column.id === "description") cellClass += " w-auto";
-        else if (cell.column.id === "status") cellClass += " w-40";
-        else if (cell.column.id === "createdAt") cellClass += " w-40";
-        else if (cell.column.id === "actions") cellClass += " w-24";
+        // Mobile-first responsive classes
+        if (cell.column.id === "index") 
+          cellClass += " w-8 sm:w-16 text-[10px] sm:text-sm text-center";
+        else if (cell.column.id === "username") 
+          cellClass += " min-w-[60px] sm:w-32 text-[10px] sm:text-sm font-medium";
+        else if (cell.column.id === "description") 
+          cellClass += " min-w-[100px] sm:w-auto text-[10px] sm:text-sm";
+        else if (cell.column.id === "status") 
+          cellClass += " min-w-[60px] sm:w-40 text-center";
+        else if (cell.column.id === "createdAt") 
+          cellClass += " min-w-[70px] sm:w-40 text-[10px] sm:text-sm text-center";
+        else if (cell.column.id === "actions") 
+          cellClass += " w-10 sm:w-24 text-center";
 
         return (
           <TableCell key={cell.id} className={cellClass}>
@@ -142,10 +149,12 @@ export function ProcurementsTable() {
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
+    // Shorter format for mobile
+    const isMobile = window.innerWidth < 640;
     return date.toLocaleDateString("id-ID", {
       day: "numeric",
-      month: "short",
-      year: "numeric",
+      month: isMobile ? "numeric" : "short",
+      year: isMobile ? "2-digit" : "numeric",
     });
   };
 
@@ -155,12 +164,22 @@ export function ProcurementsTable() {
       label: status.replace(/_/g, " "),
     };
 
+    // Shorter labels for mobile
+    const mobileLabel = {
+      WAITING_CONFIRMATION: "Waiting",
+      PRIORITAS: "Prioritas",
+      URGENT: "Urgent",
+      COMPLEMENT: "Complement",
+      REJECTED: "Rejected",
+    }[status] || config.label;
+
     return (
       <Badge
         variant="outline"
-        className={`px-3 py-1 font-medium text-xs whitespace-nowrap ${config.color}`}
+        className={`px-1 sm:px-3 py-0 sm:py-1 font-medium text-[8px] sm:text-xs whitespace-nowrap ${config.color}`}
       >
-        {config.label}
+        <span className="hidden sm:inline">{config.label}</span>
+        <span className="sm:hidden">{mobileLabel}</span>
       </Badge>
     );
   };
@@ -169,48 +188,53 @@ export function ProcurementsTable() {
     {
       accessorKey: "index",
       header: () => (
-        <div className="text-center text-xs font-semibold uppercase tracking-wider">
-          No.
+        <div className="text-center text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
+          No
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-center text-sm">{row.index + 1}</div>
+        <div className="text-center text-[10px] sm:text-sm">{row.index + 1}</div>
       ),
       enableHiding: false,
-      size: 60,
+      size: 40,
     },
     {
       accessorKey: "username",
       header: () => (
-        <div className="text-left text-xs font-semibold uppercase tracking-wider">
+        <div className="text-left text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
           Nama
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-left font-medium text-sm">
+        <div className="text-left font-medium text-[10px] sm:text-sm truncate" title={row.original.username}>
           {row.original.username}
         </div>
       ),
-      size: 150,
+      size: 120,
     },
     {
       accessorKey: "description",
       header: () => (
-        <div className="text-left text-xs font-semibold uppercase tracking-wider">
-          Keterangan
+        <div className="text-left text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
+          <span className="hidden sm:inline">Keterangan</span>
+          <span className="sm:hidden">Ktrg</span>
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-left text-sm text-gray-600 truncate">
+        <div 
+          className="text-left text-[10px] sm:text-sm text-gray-600 truncate"
+          style={{ maxWidth: '100px' }}
+          title={row.original.description}
+        >
           {row.original.description}
         </div>
       ),
-      size: 300,
+      size: 200,
     },
     {
       accessorKey: "status",
       header: () => (
-        <div className="text-center text-xs font-semibold uppercase tracking-wider">
+        <div className="text-center text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
           Status
         </div>
       ),
@@ -219,44 +243,46 @@ export function ProcurementsTable() {
           <StatusBadge status={row.original.status} />
         </div>
       ),
-      size: 150,
+      size: 100,
     },
     {
       accessorKey: "createdAt",
       header: () => (
-        <div className="text-center text-xs font-semibold uppercase tracking-wider">
-          Tanggal
+        <div className="text-center text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
+          <span className="hidden sm:inline">Tanggal</span>
+          <span className="sm:hidden">Tgl</span>
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-center text-sm text-gray-600">
+        <div className="text-center text-[10px] sm:text-sm text-gray-600">
           {formatDate(row.original.createdAt)}
         </div>
       ),
-      size: 130,
+      size: 90,
     },
     {
       id: "actions",
       header: () => (
-        <div className="text-center text-xs font-semibold uppercase tracking-wider">
-          Actions
+        <div className="text-center text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
+          <span className="hidden sm:inline">Actions</span>
+          <span className="sm:hidden">Act</span>
         </div>
       ),
       cell: ({ row }) => (
         <div className="flex justify-center">
           <Button
             variant="ghost"
-            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-1 rounded-full"
+            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-0 sm:p-1 rounded-full h-6 w-6 sm:h-8 sm:w-8"
             size="icon"
             onClick={() => handleViewDetails(row.original.id)}
           >
-            <Eye className="h-4 w-4" />
+            <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="sr-only">View details</span>
           </Button>
         </div>
       ),
       enableHiding: false,
-      size: 80,
+      size: 60,
     },
   ];
 
@@ -308,10 +334,10 @@ export function ProcurementsTable() {
   }
 
   return (
-    <div className="space-y-4 max-w-full">
+    <div className="space-y-3 sm:space-y-4 max-w-full">
       {/* Search and Filter Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        <div className="flex-1 max-w-md">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 sm:gap-3">
+        <div className="flex-1 max-w-full lg:max-w-md">
           <Input
             placeholder="Cari pengadaan..."
             value={searchQuery}
@@ -319,21 +345,25 @@ export function ProcurementsTable() {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full"
+            className="w-full text-sm"
           />
         </div>
         <div className="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="flex items-center">
-                <FilterIcon className="h-3.5 w-3.5 mr-1.5" />
-                <span className="text-sm">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center text-xs md:text-sm h-9 sm:h-9 px-2 sm:px-3"
+              >
+                <FilterIcon className="h-3.5 w-3.5 mr-1" />
+                <span className="truncate">
                   {statusFilter
                     ? STATUS_CONFIG[statusFilter as keyof typeof STATUS_CONFIG]
                         ?.label || statusFilter.replace(/_/g, " ")
-                    : "All Status"}
+                    : "Status"}
                 </span>
-                <ChevronDownIcon className="ml-1.5 h-3.5 w-3.5" />
+                <ChevronDownIcon className="ml-1 h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
@@ -342,6 +372,7 @@ export function ProcurementsTable() {
                   setStatusFilter("");
                   setCurrentPage(1);
                 }}
+                className="cursor-pointer"
               >
                 All Status
               </DropdownMenuItem>
@@ -352,7 +383,7 @@ export function ProcurementsTable() {
                     setStatusFilter(status);
                     setCurrentPage(1);
                   }}
-                  className="flex items-center"
+                  className="flex items-center cursor-pointer"
                 >
                   <div
                     className={`w-2 h-2 rounded-full mr-2 ${
@@ -367,9 +398,13 @@ export function ProcurementsTable() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="text-sm">
-                Columns
-                <ChevronDownIcon className="ml-1.5 h-3.5 w-3.5" />
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-xs md:text-sm h-9 sm:h-9 px-2 sm:px-3"
+              >
+                <span>Cols</span>
+                <ChevronDownIcon className="ml-1 h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
@@ -383,7 +418,7 @@ export function ProcurementsTable() {
                 .map((column) => (
                   <DropdownMenuCheckboxItem
                     key={column.id}
-                    className="capitalize"
+                    className="capitalize cursor-pointer"
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) =>
                       column.toggleVisibility(!!value)
@@ -406,8 +441,8 @@ export function ProcurementsTable() {
           sensors={sensors}
           id={sortableId}
         >
-          <div className="w-full overflow-x-auto">
-            <Table className="w-full table-fixed">
+          <div className="w-full overflow-x-auto" style={{ minHeight: "400px" }}>
+            <Table className="w-full min-w-[450px] table-fixed">
               <TableHeader className="bg-gray-50">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow
@@ -415,20 +450,20 @@ export function ProcurementsTable() {
                     className="border-b border-gray-200"
                   >
                     {headerGroup.headers.map((header) => {
-                      let widthClass = "";
-                      if (header.id === "index") widthClass = "w-16";
-                      else if (header.id === "username") widthClass = "w-32";
-                      else if (header.id === "description")
-                        widthClass = "w-auto";
-                      else if (header.id === "status") widthClass = "w-40";
-                      else if (header.id === "createdAt") widthClass = "w-40";
-                      else if (header.id === "actions") widthClass = "w-24";
+                      let headerClass = "h-7 sm:h-10 px-0.5 sm:px-4 text-gray-700";
+                      
+                      if (header.id === "index") headerClass += " w-8 sm:w-16";
+                      else if (header.id === "username") headerClass += " min-w-[60px] sm:w-32";
+                      else if (header.id === "description") headerClass += " min-w-[100px] sm:w-auto";
+                      else if (header.id === "status") headerClass += " min-w-[60px] sm:w-40";
+                      else if (header.id === "createdAt") headerClass += " min-w-[70px] sm:w-40";
+                      else if (header.id === "actions") headerClass += " w-10 sm:w-24";
 
                       return (
                         <TableHead
                           key={header.id}
                           colSpan={header.colSpan}
-                          className={`h-10 px-4 text-gray-700 ${widthClass}`}
+                          className={headerClass}
                         >
                           {header.isPlaceholder
                             ? null
@@ -449,9 +484,9 @@ export function ProcurementsTable() {
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      <div className="flex justify-center">
-                        <div className="w-6 h-6 border-2 border-t-blue-500 rounded-full animate-spin"></div>
-                        <span className="ml-2 text-gray-500">Loading...</span>
+                      <div className="flex justify-center items-center">
+                        <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-t-blue-500 rounded-full animate-spin"></div>
+                        <span className="ml-2 text-xs sm:text-sm text-gray-500">Loading...</span>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -462,8 +497,8 @@ export function ProcurementsTable() {
                       className="h-24 text-center text-red-500"
                     >
                       <div className="flex flex-col items-center gap-1">
-                        <span>Error loading data</span>
-                        <span className="text-sm text-red-400">
+                        <span className="text-sm">Error loading data</span>
+                        <span className="text-xs sm:text-sm text-red-400">
                           {error.message}
                         </span>
                       </div>
@@ -484,7 +519,9 @@ export function ProcurementsTable() {
                       colSpan={columns.length}
                       className="h-24 text-center text-gray-500"
                     >
-                      Tidak ada data pengadaan ditemukan
+                      <span className="text-sm">
+                        Tidak ada data pengadaan ditemukan
+                      </span>
                     </TableCell>
                   </TableRow>
                 )}
@@ -494,7 +531,7 @@ export function ProcurementsTable() {
         </DndContext>
 
         {procurementsData?.meta && (
-          <div className="border-t border-gray-200 bg-gray-50 py-3 px-4">
+          <div className="border-t border-gray-200 bg-gray-50 py-2 sm:py-3 px-2 sm:px-4">
             <PaginationSection
               page={procurementsData.meta.page}
               take={procurementsData.meta.take}

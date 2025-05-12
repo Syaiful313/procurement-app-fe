@@ -1,5 +1,7 @@
+import DashboardProcurementUsersPage from "@/features/dashboard/procurement/users";
+
 const DashboardProcurementUsers = () => {
-  return <div>DashboardProcurementUsers</div>;
+  return <DashboardProcurementUsersPage />;
 };
 
 export default DashboardProcurementUsers;
