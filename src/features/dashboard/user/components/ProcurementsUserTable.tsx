@@ -9,7 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -18,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import ModalDetailSection from "@/components/DetailModalSection";
 import useGetUserProcurements from "@/hooks/api/dashboard-user/useGetUserProcurements";
 import { Procurement } from "@/types/procurement";
@@ -50,7 +48,6 @@ import {
 } from "@tanstack/react-table";
 import { ChevronDownIcon, Eye, FilterIcon } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
-import { useDebounceValue } from "usehooks-ts";
 
 const STATUS_CONFIG = {
   WAITING_CONFIRMATION: {
@@ -75,6 +72,12 @@ const STATUS_CONFIG = {
   },
 };
 
+const DEPARTMENT_MAPPING = {
+  PURCHASE: "Pembelian",
+  FACTORY: "Pabrik",
+  OFFICE: "Kantor",
+} as const;
+
 function DraggableRow({ row }: { row: Row<Procurement> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
@@ -92,22 +95,22 @@ function DraggableRow({ row }: { row: Row<Procurement> }) {
       }}
     >
       {row.getVisibleCells().map((cell) => {
-        let cellClass = "py-2 sm:py-3 px-1 sm:px-4";
+        let cellClass = "py-2 sm:py-3 px-2 sm:px-4";
 
         if (cell.column.id === "index")
-          cellClass += " w-12 sm:w-16 text-xs sm:text-sm text-center";
+          cellClass += " w-8 sm:w-12 text-xs sm:text-sm text-center";
         else if (cell.column.id === "username")
-          cellClass +=
-            " min-w-[80px] sm:w-32 text-xs sm:text-sm font-medium";
+          cellClass += " w-20 sm:w-32 text-xs sm:text-sm font-medium";
         else if (cell.column.id === "description")
-          cellClass += " min-w-[120px] sm:w-auto text-xs sm:text-sm";
+          cellClass += " min-w-[120px] max-w-[150px] sm:max-w-[250px] text-xs sm:text-sm";
+        else if (cell.column.id === "department")
+          cellClass += " min-w-[80px] max-w-[120px] sm:max-w-[180px] text-xs sm:text-sm";
         else if (cell.column.id === "status")
-          cellClass += " min-w-[80px] sm:w-40 text-center";
+          cellClass += " w-20 sm:w-32 text-center";
         else if (cell.column.id === "createdAt")
-          cellClass +=
-            " min-w-[80px] sm:w-40 text-xs sm:text-sm text-center";
+          cellClass += " w-16 sm:w-32 text-xs sm:text-sm text-center";
         else if (cell.column.id === "actions")
-          cellClass += " w-12 sm:w-24 text-center";
+          cellClass += " w-10 sm:w-16 text-center";
 
         return (
           <TableCell key={cell.id} className={cellClass}>
@@ -120,8 +123,6 @@ function DraggableRow({ row }: { row: Row<Procurement> }) {
 }
 
 export function ProcurementsUserTable() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch] = useDebounceValue(searchQuery, 400);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [rowSelection, setRowSelection] = useState({});
@@ -139,12 +140,12 @@ export function ProcurementsUserTable() {
   } = useGetUserProcurements({
     page: currentPage,
     take: pageSize,
-    search: debouncedSearch,
     status: statusFilter,
   });
 
   const [data, setData] = useState<Procurement[]>([]);
 
+  // Remove the useEffect for column visibility based on screen size
   useEffect(() => {
     if (procurementsData?.data) {
       setData(procurementsData.data);
@@ -179,7 +180,7 @@ export function ProcurementsUserTable() {
     return (
       <Badge
         variant="outline"
-        className={`px-2 sm:px-3 py-0.5 sm:py-1 font-medium text-xs sm:text-xs whitespace-nowrap ${config.color}`}
+        className={`px-1.5 sm:px-3 py-0.5 sm:py-1 font-medium text-[10px] sm:text-xs whitespace-nowrap ${config.color}`}
       >
         <span className="hidden sm:inline">{config.label}</span>
         <span className="sm:hidden">{mobileLabel}</span>
@@ -201,22 +202,19 @@ export function ProcurementsUserTable() {
     {
       accessorKey: "index",
       header: () => (
-        <div className="text-center text-xs sm:text-xs font-semibold uppercase tracking-wider">
+        <div className="text-center text-xs font-semibold uppercase tracking-wider">
           No
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-center text-xs sm:text-sm">
-          {row.index + 1}
-        </div>
+        <div className="text-center text-xs sm:text-sm">{row.index + 1}</div>
       ),
       enableHiding: false,
-      size: 40,
     },
     {
       accessorKey: "username",
       header: () => (
-        <div className="text-left text-xs sm:text-xs font-semibold uppercase tracking-wider">
+        <div className="text-left text-xs font-semibold uppercase tracking-wider">
           Nama
         </div>
       ),
@@ -228,31 +226,52 @@ export function ProcurementsUserTable() {
           {row.original.username}
         </div>
       ),
-      size: 120,
     },
     {
       accessorKey: "description",
       header: () => (
-        <div className="text-left text-xs sm:text-xs font-semibold uppercase tracking-wider">
+        <div className="text-left text-xs font-semibold uppercase tracking-wider">
           <span className="hidden sm:inline">Keterangan</span>
           <span className="sm:hidden">Keterangan</span>
         </div>
       ),
       cell: ({ row }) => (
-        <div
-          className="text-left text-xs sm:text-sm text-gray-600 truncate"
-          style={{ maxWidth: "120px" }}
-          title={row.original.description}
-        >
-          {row.original.description}
+        <div className="text-left">
+          <div
+            className="text-xs sm:text-sm text-gray-600 line-clamp-2 sm:line-clamp-none sm:truncate"
+            title={row.original.description}
+          >
+            {row.original.description}
+          </div>
         </div>
       ),
-      size: 200,
+    },
+    {
+      accessorKey: "department",
+      header: () => (
+        <div className="text-left text-xs font-semibold uppercase tracking-wider">
+          <span className="hidden sm:inline">Departemen</span>
+          <span className="sm:hidden">Dept</span>
+        </div>
+      ),
+      cell: ({ row }) => {
+        const departmentKey = row.original.department as keyof typeof DEPARTMENT_MAPPING;
+        const displayDepartment = DEPARTMENT_MAPPING[departmentKey] || row.original.department;
+        
+        return (
+          <div
+            className="text-left text-xs sm:text-sm text-gray-600 truncate"
+            title={displayDepartment}
+          >
+            {displayDepartment}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "status",
       header: () => (
-        <div className="text-center text-xs sm:text-xs font-semibold uppercase tracking-wider">
+        <div className="text-center text-xs font-semibold uppercase tracking-wider">
           Status
         </div>
       ),
@@ -261,45 +280,42 @@ export function ProcurementsUserTable() {
           <StatusBadge status={row.original.status} />
         </div>
       ),
-      size: 100,
     },
     {
       accessorKey: "createdAt",
       header: () => (
-        <div className="text-center text-xs sm:text-xs font-semibold uppercase tracking-wider">
+        <div className="text-center text-xs font-semibold uppercase tracking-wider">
           <span className="hidden sm:inline">Tanggal</span>
-          <span className="sm:hidden">Tanggal</span>
+          <span className="sm:hidden">Tgl</span>
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-center text-xs sm:text-sm text-gray-600">
-          {formatDate(row.original.createdAt)}
+        <div className="text-center text-[10px] sm:text-sm text-gray-600">
+          {formatDate(row.original.date)}
         </div>
       ),
-      size: 90,
     },
     {
       id: "actions",
       header: () => (
-        <div className="text-center text-xs sm:text-xs font-semibold uppercase tracking-wider">
-          Aksi
+        <div className="text-center text-xs font-semibold uppercase tracking-wider">
+          <span className="sr-only">Aksi</span>
         </div>
       ),
       cell: ({ row }) => (
         <div className="flex justify-center">
           <Button
             variant="ghost"
-            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-1 sm:p-1 rounded-full h-8 w-8 sm:h-8 sm:w-8"
+            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-1 rounded-full h-6 w-6 sm:h-8 sm:w-8"
             size="icon"
             onClick={() => handleViewDetails(row.original.id)}
           >
-            <Eye className="h-4 w-4 sm:h-4 sm:w-4" />
+            <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="sr-only">Lihat detail</span>
           </Button>
         </div>
       ),
       enableHiding: false,
-      size: 60,
     },
   ];
 
@@ -343,27 +359,16 @@ export function ProcurementsUserTable() {
   return (
     <>
       <div className="space-y-3 sm:space-y-4 max-w-full">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-3">
-          <div className="flex-1 max-w-full lg:max-w-md">
-            <Input
-              placeholder="Cari pengadaan..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full text-sm h-10"
-            />
-          </div>
+        <div className="flex flex-col lg:flex-row lg:items-center justify-end gap-3 sm:gap-3">
           <div className="flex gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex items-center text-sm md:text-sm h-10 sm:h-9 px-3 sm:px-3"
+                  className="flex items-center text-xs sm:text-sm h-9 sm:h-9 px-2 sm:px-3"
                 >
-                  <FilterIcon className="h-4 w-4 mr-1.5" />
+                  <FilterIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5" />
                   <span className="truncate">
                     {statusFilter
                       ? STATUS_CONFIG[
@@ -371,7 +376,7 @@ export function ProcurementsUserTable() {
                         ]?.label || statusFilter.replace(/_/g, " ")
                       : "Status"}
                   </span>
-                  <ChevronDownIcon className="ml-1.5 h-4 w-4" />
+                  <ChevronDownIcon className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -409,10 +414,10 @@ export function ProcurementsUserTable() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-sm md:text-sm h-10 sm:h-9 px-3 sm:px-3"
+                  className="text-xs sm:text-sm h-9 sm:h-9 px-2 sm:px-3"
                 >
                   <span>Kolom</span>
-                  <ChevronDownIcon className="ml-1.5 h-4 w-4" />
+                  <ChevronDownIcon className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
@@ -438,6 +443,8 @@ export function ProcurementsUserTable() {
                         ? "Nama"
                         : column.id === "description"
                         ? "Keterangan"
+                        : column.id === "department"
+                        ? "Departemen"
                         : column.id === "status"
                         ? "Status"
                         : column.id === "createdAt"
@@ -458,11 +465,8 @@ export function ProcurementsUserTable() {
             sensors={sensors}
             id={sortableId}
           >
-            <div
-              className="w-full overflow-x-auto"
-              style={{ minHeight: "400px" }}
-            >
-              <Table className="w-full min-w-[500px] table-fixed">
+            <div className="w-full overflow-x-auto">
+              <Table className="w-full min-w-[500px]">
                 <TableHeader className="bg-gray-50">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow
@@ -471,20 +475,22 @@ export function ProcurementsUserTable() {
                     >
                       {headerGroup.headers.map((header) => {
                         let headerClass =
-                          "h-9 sm:h-10 px-1 sm:px-4 text-gray-700";
+                          "h-8 sm:h-10 px-2 sm:px-4 text-gray-700";
 
                         if (header.id === "index")
-                          headerClass += " w-12 sm:w-16";
+                          headerClass += " w-8 sm:w-12";
                         else if (header.id === "username")
-                          headerClass += " min-w-[80px] sm:w-32";
+                          headerClass += " w-20 sm:w-32";
                         else if (header.id === "description")
-                          headerClass += " min-w-[120px] sm:w-auto";
+                          headerClass += " w-auto";
+                        else if (header.id === "department")
+                          headerClass += " w-20 sm:w-40";
                         else if (header.id === "status")
-                          headerClass += " min-w-[80px] sm:w-40";
+                          headerClass += " w-20 sm:w-32";
                         else if (header.id === "createdAt")
-                          headerClass += " min-w-[80px] sm:w-40";
+                          headerClass += " w-16 sm:w-32";
                         else if (header.id === "actions")
-                          headerClass += " w-12 sm:w-24";
+                          headerClass += " w-10 sm:w-16";
 
                         return (
                           <TableHead
@@ -512,8 +518,8 @@ export function ProcurementsUserTable() {
                         className="h-24 text-center"
                       >
                         <div className="flex justify-center items-center">
-                          <div className="w-6 h-6 sm:w-6 sm:h-6 border-2 border-t-blue-500 rounded-full animate-spin"></div>
-                          <span className="ml-2 text-sm sm:text-sm text-gray-500">
+                          <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-t-blue-500 rounded-full animate-spin"></div>
+                          <span className="ml-2 text-xs sm:text-sm text-gray-500">
                             Memuat...
                           </span>
                         </div>
@@ -527,7 +533,7 @@ export function ProcurementsUserTable() {
                       >
                         <div className="flex flex-col items-center gap-1">
                           <span className="text-sm">Kesalahan memuat data</span>
-                          <span className="text-sm sm:text-sm text-red-400">
+                          <span className="text-xs sm:text-sm text-red-400">
                             {error.message}
                           </span>
                         </div>
@@ -560,7 +566,7 @@ export function ProcurementsUserTable() {
           </DndContext>
 
           {procurementsData?.meta && (
-            <div className="border-t border-gray-200 bg-gray-50 py-3 sm:py-3 px-3 sm:px-4">
+            <div className="border-t border-gray-200 bg-gray-50 py-2 sm:py-3 px-3 sm:px-4">
               <PaginationSection
                 page={procurementsData.meta.page}
                 take={procurementsData.meta.take}

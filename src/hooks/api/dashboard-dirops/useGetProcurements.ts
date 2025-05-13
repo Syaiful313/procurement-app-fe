@@ -4,8 +4,7 @@ import { Procurement } from "@/types/procurement";
 import { useQuery } from "@tanstack/react-query";
 
 interface GetProcurementsQuery extends PaginationQueries {
-  search?: string
-   status?: string;
+  status?: string;
 }
 
 const useGetProcurements = (queries: GetProcurementsQuery) => {
@@ -16,7 +15,7 @@ const useGetProcurements = (queries: GetProcurementsQuery) => {
         "/dirops",
         {
           params: queries,
-        },
+        }
       );
       return data;
     },

@@ -4,7 +4,6 @@ import { User } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 
 interface GetUsersQuery extends PaginationQueries {
-  search?: string;
   role?: string;
 }
 

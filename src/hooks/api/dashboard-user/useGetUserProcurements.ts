@@ -5,7 +5,6 @@ import { Procurement } from "@/types/procurement";
 import { useQuery } from "@tanstack/react-query";
 
 interface GetUserProcurementsQuery extends PaginationQueries {
-  search?: string;
   status?: string;
 }
 
