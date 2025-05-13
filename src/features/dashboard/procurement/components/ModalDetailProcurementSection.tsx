@@ -163,6 +163,67 @@ const ModalDetailSectionProcurement: React.FC<ModalDetailSectionProps> = ({
                   </div>
                 </div>
 
+                
+
+                {procurement.department && (
+                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
+                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
+                      <span>Departemen</span>
+                      <span>:</span>
+                    </div>
+                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
+                      {DEPARTMENT_MAPPING[procurement.department as keyof typeof DEPARTMENT_MAPPING] || procurement.department}
+                    </div>
+                  </div>
+                )}
+
+                {procurement.itemName && (
+                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
+                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
+                      <span>Nama Barang</span>
+                      <span>:</span>
+                    </div>
+                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
+                      {procurement.itemName}
+                    </div>
+                  </div>
+                )}
+
+                {procurement.specification && (
+                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-start">
+                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
+                      <span>Spesifikasi</span>
+                      <span>:</span>
+                    </div>
+                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
+                      {procurement.specification}
+                    </div>
+                  </div>
+                )}
+
+                {procurement.quantity && (
+                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
+                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
+                      <span>Jumlah</span>
+                      <span>:</span>
+                    </div>
+                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
+                      {procurement.quantity}
+                    </div>
+                  </div>
+                )}
+                {procurement.unit && (
+                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
+                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
+                      <span>Satuan</span>
+                      <span>:</span>
+                    </div>
+                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
+                      {procurement.unit}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-start">
                   <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
                     <span>Keterangan</span>
@@ -180,18 +241,6 @@ const ModalDetailSectionProcurement: React.FC<ModalDetailSectionProps> = ({
                     <StatusBadge status={procurement.status} />
                   </div>
                 </div>
-
-                {procurement.department && (
-                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
-                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
-                      <span>Departemen</span>
-                      <span>:</span>
-                    </div>
-                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
-                      {DEPARTMENT_MAPPING[procurement.department as keyof typeof DEPARTMENT_MAPPING] || procurement.department}
-                    </div>
-                  </div>
-                )}
 
                 <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
                   <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">

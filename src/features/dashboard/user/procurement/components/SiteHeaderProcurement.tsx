@@ -22,7 +22,7 @@ import {
             <BreadcrumbList>
               <BreadcrumbItem>
                 <Link
-                  href="/dashboard"
+                  href="/dashboard/user"
                   className="text-muted-foreground hover:text-primary text-base font-medium"
                 >
                   Dashboard

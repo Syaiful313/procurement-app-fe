@@ -14,7 +14,7 @@ export default function DashboardUserPage() {
             <h1 className="text-2xl font-bold">Pengadaan barang</h1>
             <p className="text-muted-foreground mt-1">
               Halaman ini menampilkan semua pengadaan barang yang telah Anda
-              buat. Anda dapat mengelola pengadaan barang Anda di sini.
+              buat. Anda dapat melihat pengadaan barang Anda di sini.
             </p>
           </div>
           <ProcurementsUserTable />

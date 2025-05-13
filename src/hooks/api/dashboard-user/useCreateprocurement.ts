@@ -11,6 +11,10 @@ interface ProcurementPayload {
   description: string;
   date: Date | string;
   department: "PURCHASE" | "FACTORY" | "OFFICE";
+  itemName: string;
+  specification: string;
+  quantity: number;
+  unit: string;
 }
 
 const useCreateProcurement = () => {
@@ -25,6 +29,10 @@ const useCreateProcurement = () => {
         description: payload.description,
         date: payload.date,
         department: payload.department,
+        itemName: payload.itemName,
+        specification: payload.specification,
+        quantity: payload.quantity,
+        unit: payload.unit,
       });
       return data;
     },

@@ -102,9 +102,21 @@ function DraggableRow({ row }: { row: Row<Procurement> }) {
         else if (cell.column.id === "username")
           cellClass += " w-20 sm:w-32 text-xs sm:text-sm font-medium";
         else if (cell.column.id === "description")
-          cellClass += " min-w-[120px] max-w-[150px] sm:max-w-[250px] text-xs sm:text-sm";
+          cellClass +=
+            " min-w-[100px] max-w-[150px] sm:max-w-[200px] text-xs sm:text-sm";
         else if (cell.column.id === "department")
-          cellClass += " min-w-[80px] max-w-[120px] sm:max-w-[180px] text-xs sm:text-sm";
+          cellClass +=
+            " min-w-[80px] max-w-[100px] sm:max-w-[150px] text-xs sm:text-sm";
+        else if (cell.column.id === "itemName")
+          cellClass +=
+            " min-w-[80px] max-w-[120px] sm:max-w-[180px] text-xs sm:text-sm";
+        else if (cell.column.id === "specification")
+          cellClass +=
+            " min-w-[100px] max-w-[150px] sm:max-w-[200px] text-xs sm:text-sm";
+        else if (cell.column.id === "quantity")
+          cellClass += " w-16 sm:w-24 text-xs sm:text-sm text-center";
+        else if (cell.column.id === "unit")
+          cellClass += " w-16 sm:w-24 text-xs sm:text-sm text-center";
         else if (cell.column.id === "status")
           cellClass += " w-20 sm:w-32 text-center";
         else if (cell.column.id === "createdAt")
@@ -145,7 +157,6 @@ export function ProcurementsUserTable() {
 
   const [data, setData] = useState<Procurement[]>([]);
 
-  // Remove the useEffect for column visibility based on screen size
   useEffect(() => {
     if (procurementsData?.data) {
       setData(procurementsData.data);
@@ -227,25 +238,7 @@ export function ProcurementsUserTable() {
         </div>
       ),
     },
-    {
-      accessorKey: "description",
-      header: () => (
-        <div className="text-left text-xs font-semibold uppercase tracking-wider">
-          <span className="hidden sm:inline">Keterangan</span>
-          <span className="sm:hidden">Keterangan</span>
-        </div>
-      ),
-      cell: ({ row }) => (
-        <div className="text-left">
-          <div
-            className="text-xs sm:text-sm text-gray-600 line-clamp-2 sm:line-clamp-none sm:truncate"
-            title={row.original.description}
-          >
-            {row.original.description}
-          </div>
-        </div>
-      ),
-    },
+
     {
       accessorKey: "department",
       header: () => (
@@ -255,9 +248,11 @@ export function ProcurementsUserTable() {
         </div>
       ),
       cell: ({ row }) => {
-        const departmentKey = row.original.department as keyof typeof DEPARTMENT_MAPPING;
-        const displayDepartment = DEPARTMENT_MAPPING[departmentKey] || row.original.department;
-        
+        const departmentKey = row.original
+          .department as keyof typeof DEPARTMENT_MAPPING;
+        const displayDepartment =
+          DEPARTMENT_MAPPING[departmentKey] || row.original.department;
+
         return (
           <div
             className="text-left text-xs sm:text-sm text-gray-600 truncate"
@@ -445,6 +440,14 @@ export function ProcurementsUserTable() {
                         ? "Keterangan"
                         : column.id === "department"
                         ? "Departemen"
+                        : column.id === "itemName"
+                        ? "Nama Barang"
+                        : column.id === "specification"
+                        ? "Spesifikasi"
+                        : column.id === "quantity"
+                        ? "Jumlah"
+                        : column.id === "unit"
+                        ? "Satuan"
                         : column.id === "status"
                         ? "Status"
                         : column.id === "createdAt"
@@ -466,7 +469,7 @@ export function ProcurementsUserTable() {
             id={sortableId}
           >
             <div className="w-full overflow-x-auto">
-              <Table className="w-full min-w-[500px]">
+              <Table className="w-full min-w-[650px]">
                 <TableHeader className="bg-gray-50">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow
@@ -485,6 +488,14 @@ export function ProcurementsUserTable() {
                           headerClass += " w-auto";
                         else if (header.id === "department")
                           headerClass += " w-20 sm:w-40";
+                        else if (header.id === "itemName")
+                          headerClass += " w-20 sm:w-40";
+                        else if (header.id === "specification")
+                          headerClass += " w-24 sm:w-48";
+                        else if (header.id === "quantity")
+                          headerClass += " w-16 sm:w-24";
+                        else if (header.id === "unit")
+                          headerClass += " w-16 sm:w-24";
                         else if (header.id === "status")
                           headerClass += " w-20 sm:w-32";
                         else if (header.id === "createdAt")

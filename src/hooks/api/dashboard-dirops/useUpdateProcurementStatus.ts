@@ -29,7 +29,7 @@ const useUpdateProcurementStatus = () => {
     onSuccess: async (data) => {
       toast.success("Status procurement berhasil diperbarui");
       await queryClient.invalidateQueries({ queryKey: ["procurements"] });
-      router.refresh();
+      router.push("/dashboard/procurement");
     },
     onError: (error: AxiosError<any>) => {
       toast.error(

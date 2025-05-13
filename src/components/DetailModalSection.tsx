@@ -82,7 +82,9 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[550px] flex flex-col h-[90vh] sm:h-auto sm:max-h-[90vh] p-0 [&>button]:hidden">
         <DialogHeader className="p-6 pb-4 border-b shrink-0">
-          <DialogTitle className="text-xl font-semibold">Detail Pengadaan</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">
+            Detail Pengadaan
+          </DialogTitle>
           <DialogDescription className="text-sm text-gray-500">
             Informasi lengkap tentang pengadaan.
           </DialogDescription>
@@ -106,14 +108,6 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-start">
-                  <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
-                    <span>Keterangan</span>
-                    <span>:</span>
-                  </div>
-                  <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">{procurement.description}</div>
-                </div>
-
                 {procurement.department && (
                   <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
                     <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
@@ -121,10 +115,68 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
                       <span>:</span>
                     </div>
                     <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
-                      {DEPARTMENT_MAPPING[procurement.department as keyof typeof DEPARTMENT_MAPPING] || procurement.department}
+                      {DEPARTMENT_MAPPING[
+                        procurement.department as keyof typeof DEPARTMENT_MAPPING
+                      ] || procurement.department}
                     </div>
                   </div>
                 )}
+
+                {procurement.itemName && (
+                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
+                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
+                      <span>Nama Barang</span>
+                      <span>:</span>
+                    </div>
+                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
+                      {procurement.itemName}
+                    </div>
+                  </div>
+                )}
+
+                {procurement.specification && (
+                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-start">
+                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
+                      <span>Spesifikasi</span>
+                      <span>:</span>
+                    </div>
+                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
+                      {procurement.specification}
+                    </div>
+                  </div>
+                )}
+
+                {procurement.quantity && (
+                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
+                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
+                      <span>Jumlah</span>
+                      <span>:</span>
+                    </div>
+                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
+                      {procurement.quantity}
+                    </div>
+                  </div>
+                )}
+                {procurement.unit && (
+                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
+                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
+                      <span>Satuan</span>
+                      <span>:</span>
+                    </div>
+                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
+                      {procurement.unit}
+                    </div>
+                  </div>
+                )}
+                <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-start">
+                  <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
+                    <span>Keterangan</span>
+                    <span>:</span>
+                  </div>
+                  <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
+                    {procurement.description}
+                  </div>
+                </div>
 
                 <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
                   <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
@@ -161,10 +213,17 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
 
               {procurement.note && (
                 <div className="space-y-3 pt-3 border-t">
-                  <div className="text-sm font-medium text-gray-800">Catatan:</div>
+                  <div className="text-sm font-medium text-gray-800">
+                    Catatan:
+                  </div>
                   <div className="bg-gray-50 rounded-md p-3">
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap break-all overflow-wrap-anywhere" 
-                      style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                    <p
+                      className="text-sm text-gray-700 whitespace-pre-wrap break-all overflow-wrap-anywhere"
+                      style={{
+                        wordBreak: "break-word",
+                        overflowWrap: "anywhere",
+                      }}
+                    >
                       {procurement.note}
                     </p>
                   </div>
@@ -179,7 +238,9 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
         </div>
 
         <DialogFooter className="p-6 pt-4 border-t shrink-0">
-          <Button onClick={onClose} className="px-6 w-full sm:w-auto">Tutup</Button>
+          <Button onClick={onClose} className="px-6 w-full sm:w-auto">
+            Tutup
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
