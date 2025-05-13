@@ -11,33 +11,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useGetProcurementById from "@/hooks/api/dashboard-dirops/useGetProcurementById";
+import { DEPARTMENT_MAPPING, STATUS_CONFIG } from "@/lib/constants";
 import { Loader2 } from "lucide-react";
-
-const STATUS_CONFIG = {
-  WAITING_CONFIRMATION: {
-    color: "bg-amber-50 text-amber-700 border-amber-200",
-    label: "Menunggu Konfirmasi",
-  },
-  PRIORITAS: {
-    color: "bg-orange-50 text-orange-700 border-orange-200",
-    label: "Prioritas",
-  },
-  URGENT: { color: "bg-red-50 text-red-700 border-red-200", label: "Mendesak" },
-  COMPLEMENT: {
-    color: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    label: "Melengkapi",
-  },
-  REJECTED: {
-    color: "bg-gray-50 text-gray-700 border-gray-200",
-    label: "Ditolak",
-  },
-};
-
-const DEPARTMENT_MAPPING = {
-  PURCHASE: "Pembelian",
-  FACTORY: "Pabrik",
-  OFFICE: "Kantor",
-};
 
 interface ModalDetailSectionProps {
   procurementId: number;

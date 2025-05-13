@@ -1,4 +1,5 @@
 "use client";
+import ModalDetailSection from "@/components/DetailModalSection";
 import PaginationSection from "@/components/PaginationSection";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,8 +18,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import ModalDetailSection from "@/components/DetailModalSection";
 import useGetUserProcurements from "@/hooks/api/dashboard-user/useGetUserProcurements";
+import {
+  DEPARTMENT_MAPPING,
+  STATUS_CONFIG,
+  TRACKING_STATUS_CONFIG,
+} from "@/lib/constants";
 import { Procurement } from "@/types/procurement";
 import {
   DndContext,
@@ -48,35 +53,6 @@ import {
 } from "@tanstack/react-table";
 import { ChevronDownIcon, Eye, FilterIcon } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
-
-const STATUS_CONFIG = {
-  WAITING_CONFIRMATION: {
-    color: "bg-amber-50 text-amber-700 border-amber-200",
-    label: "Menunggu Konfirmasi",
-  },
-  PRIORITAS: {
-    color: "bg-orange-50 text-orange-700 border-orange-200",
-    label: "Prioritas",
-  },
-  URGENT: {
-    color: "bg-red-50 text-red-700 border-red-200",
-    label: "Mendesak",
-  },
-  COMPLEMENT: {
-    color: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    label: "Melengkapi",
-  },
-  REJECTED: {
-    color: "bg-gray-50 text-gray-700 border-gray-200",
-    label: "Ditolak",
-  },
-};
-
-const DEPARTMENT_MAPPING = {
-  PURCHASE: "Pembelian",
-  FACTORY: "Pabrik",
-  OFFICE: "Kantor",
-} as const;
 
 function DraggableRow({ row }: { row: Row<Procurement> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
@@ -118,6 +94,8 @@ function DraggableRow({ row }: { row: Row<Procurement> }) {
         else if (cell.column.id === "unit")
           cellClass += " w-16 sm:w-24 text-xs sm:text-sm text-center";
         else if (cell.column.id === "status")
+          cellClass += " w-20 sm:w-32 text-center";
+        else if (cell.column.id === "trackingStatus")
           cellClass += " w-20 sm:w-32 text-center";
         else if (cell.column.id === "createdAt")
           cellClass += " w-16 sm:w-32 text-xs sm:text-sm text-center";
@@ -199,6 +177,24 @@ export function ProcurementsUserTable() {
     );
   };
 
+  const TrackingStatusBadge = ({ status }: { status: string }) => {
+    const config = TRACKING_STATUS_CONFIG[
+      status as keyof typeof TRACKING_STATUS_CONFIG
+    ] || {
+      color: "bg-gray-50 text-gray-600 border-gray-200",
+      label: status.replace(/_/g, " "),
+    };
+
+    return (
+      <Badge
+        variant="outline"
+        className={`px-1.5 sm:px-3 py-0.5 sm:py-1 font-medium text-[10px] sm:text-xs whitespace-nowrap ${config.color}`}
+      >
+        <span>{config.label}</span>
+      </Badge>
+    );
+  };
+
   const handleViewDetails = (id: number) => {
     setSelectedProcurementId(id);
     setDetailModalOpen(true);
@@ -238,7 +234,6 @@ export function ProcurementsUserTable() {
         </div>
       ),
     },
-
     {
       accessorKey: "department",
       header: () => (
@@ -273,6 +268,20 @@ export function ProcurementsUserTable() {
       cell: ({ row }) => (
         <div className="flex justify-center">
           <StatusBadge status={row.original.status} />
+        </div>
+      ),
+    },
+    {
+      accessorKey: "trackingStatus",
+      header: () => (
+        <div className="text-center text-xs font-semibold uppercase tracking-wider">
+          <span className="hidden sm:inline">Tracking</span>
+          <span className="sm:hidden">Track</span>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex justify-center">
+          <TrackingStatusBadge status={row.original.trackingStatus} />
         </div>
       ),
     },
@@ -450,6 +459,8 @@ export function ProcurementsUserTable() {
                         ? "Satuan"
                         : column.id === "status"
                         ? "Status"
+                        : column.id === "trackingStatus"
+                        ? "Tracking"
                         : column.id === "createdAt"
                         ? "Tanggal"
                         : column.id}
@@ -497,6 +508,8 @@ export function ProcurementsUserTable() {
                         else if (header.id === "unit")
                           headerClass += " w-16 sm:w-24";
                         else if (header.id === "status")
+                          headerClass += " w-20 sm:w-32";
+                        else if (header.id === "trackingStatus")
                           headerClass += " w-20 sm:w-32";
                         else if (header.id === "createdAt")
                           headerClass += " w-16 sm:w-32";

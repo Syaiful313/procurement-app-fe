@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 
 interface GetProcurementsQuery extends PaginationQueries {
   status?: string;
+  department?: string;
 }
 
 const useGetProcurements = (queries: GetProcurementsQuery) => {

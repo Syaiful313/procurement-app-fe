@@ -18,7 +18,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import useGetProcurements from "@/hooks/api/dashboard-dirops/useGetProcurements";
-import { Procurement } from "@/types/procurement";
+import useUpdateProcurementStatus from "@/hooks/api/dashboard-dirops/useUpdateProcurementStatus";
+import useUpdateTrackingStatus from "@/hooks/api/dashboard-procurement/useUpdateTrackingStatus";
+import { Procurement, ProcurementStatus, TrackingStatus } from "@/types/procurement";
 import {
   DndContext,
   KeyboardSensor,
@@ -45,38 +47,16 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDownIcon, Eye, FilterIcon } from "lucide-react";
+import { ChevronDownIcon, Eye, FilterIcon, TruckIcon, Edit } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import ModalDetailSectionProcurement from "./ModalDetailProcurementSection";
-
-const STATUS_CONFIG = {
-  WAITING_CONFIRMATION: {
-    color: "bg-amber-50 text-amber-700 border-amber-200",
-    label: "Menunggu Konfirmasi",
-  },
-  PRIORITAS: {
-    color: "bg-orange-50 text-orange-700 border-orange-200",
-    label: "Prioritas",
-  },
-  URGENT: {
-    color: "bg-red-50 text-red-700 border-red-200",
-    label: "Mendesak",
-  },
-  COMPLEMENT: {
-    color: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    label: "Melengkapi",
-  },
-  REJECTED: {
-    color: "bg-gray-50 text-gray-700 border-gray-200",
-    label: "Ditolak",
-  },
-};
-
-const DEPARTMENT_MAPPING = {
-  PURCHASE: "Pembelian",
-  FACTORY: "Pabrik",
-  OFFICE: "Kantor",
-} as const;
+import ModalUpdateTrackingStatus from "./ModalUpdateTrackingStatus";
+import ModalUpdateStatus from "./ModalUpdateStatus";
+import {
+  DEPARTMENT_MAPPING,
+  STATUS_CONFIG,
+  TRACKING_STATUS_CONFIG,
+} from "@/lib/constants";
 
 function DraggableRow({ row }: { row: Row<Procurement> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
@@ -119,6 +99,8 @@ function DraggableRow({ row }: { row: Row<Procurement> }) {
           cellClass += " w-16 sm:w-24 text-xs sm:text-sm text-center";
         else if (cell.column.id === "status")
           cellClass += " w-20 sm:w-32 text-center";
+        else if (cell.column.id === "trackingStatus")
+          cellClass += " w-20 sm:w-32 text-center";
         else if (cell.column.id === "createdAt")
           cellClass += " w-16 sm:w-32 text-xs sm:text-sm text-center";
         else if (cell.column.id === "actions")
@@ -140,10 +122,25 @@ export function ProcurementsTable() {
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState({});
   const [statusFilter, setStatusFilter] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState("");
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedProcurementId, setSelectedProcurementId] = useState<
     number | null
   >(null);
+  const [trackingModalOpen, setTrackingModalOpen] = useState(false);
+  const [selectedProcurementForTracking, setSelectedProcurementForTracking] =
+    useState<Procurement | null>(null);
+  const [selectedTrackingStatus, setSelectedTrackingStatus] = useState<
+    TrackingStatus | ""
+  >("");
+  
+  // New states for status update
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [selectedProcurementForStatus, setSelectedProcurementForStatus] =
+    useState<Procurement | null>(null);
+  const [selectedProcurementStatus, setSelectedProcurementStatus] = useState<
+    ProcurementStatus | ""
+  >("");
 
   const {
     data: procurementsData,
@@ -153,7 +150,11 @@ export function ProcurementsTable() {
     page: currentPage,
     take: pageSize,
     status: statusFilter,
+    department: departmentFilter,
   });
+
+  const updateTrackingStatus = useUpdateTrackingStatus();
+  const updateProcurementStatus = useUpdateProcurementStatus();
 
   const [data, setData] = useState<Procurement[]>([]);
 
@@ -197,6 +198,69 @@ export function ProcurementsTable() {
         <span className="sm:hidden">{mobileLabel}</span>
       </Badge>
     );
+  };
+
+  const TrackingStatusBadge = ({ status }: { status: string }) => {
+    const config = TRACKING_STATUS_CONFIG[
+      status as keyof typeof TRACKING_STATUS_CONFIG
+    ] || {
+      color: "bg-gray-50 text-gray-600 border-gray-200",
+      label: status.replace(/_/g, " "),
+    };
+
+    return (
+      <Badge
+        variant="outline"
+        className={`px-1.5 sm:px-3 py-0.5 sm:py-1 font-medium text-[10px] sm:text-xs whitespace-nowrap ${config.color}`}
+      >
+        <span>{config.label}</span>
+      </Badge>
+    );
+  };
+
+  const handleOpenTrackingModal = (procurement: Procurement) => {
+    setSelectedProcurementForTracking(procurement);
+    setSelectedTrackingStatus(procurement.trackingStatus);
+    setTrackingModalOpen(true);
+  };
+
+  const handleCloseTrackingModal = () => {
+    setTrackingModalOpen(false);
+    setSelectedProcurementForTracking(null);
+    setSelectedTrackingStatus("");
+  };
+
+  const handleUpdateTrackingStatus = () => {
+    if (selectedProcurementForTracking && selectedTrackingStatus) {
+      updateTrackingStatus.mutate({
+        id: selectedProcurementForTracking.id,
+        trackingStatus: selectedTrackingStatus as TrackingStatus,
+      });
+      handleCloseTrackingModal();
+    }
+  };
+
+  // New status update handlers
+  const handleOpenStatusModal = (procurement: Procurement) => {
+    setSelectedProcurementForStatus(procurement);
+    setSelectedProcurementStatus(procurement.status as ProcurementStatus);
+    setStatusModalOpen(true);
+  };
+
+  const handleCloseStatusModal = () => {
+    setStatusModalOpen(false);
+    setSelectedProcurementForStatus(null);
+    setSelectedProcurementStatus("");
+  };
+
+  const handleUpdateProcurementStatus = () => {
+    if (selectedProcurementForStatus && selectedProcurementStatus) {
+      updateProcurementStatus.mutate({
+        id: selectedProcurementForStatus.id,
+        status: selectedProcurementStatus as ProcurementStatus,
+      });
+      handleCloseStatusModal();
+    }
   };
 
   const columns: ColumnDef<Procurement>[] = [
@@ -252,7 +316,6 @@ export function ProcurementsTable() {
         );
       },
     },
-
     {
       accessorKey: "status",
       header: () => (
@@ -263,6 +326,20 @@ export function ProcurementsTable() {
       cell: ({ row }) => (
         <div className="flex justify-center">
           <StatusBadge status={row.original.status} />
+        </div>
+      ),
+    },
+    {
+      accessorKey: "trackingStatus",
+      header: () => (
+        <div className="text-center text-xs font-semibold uppercase tracking-wider">
+          <span className="hidden sm:inline">Tracking</span>
+          <span className="sm:hidden">Track</span>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex justify-center">
+          <TrackingStatusBadge status={row.original.trackingStatus} />
         </div>
       ),
     },
@@ -288,7 +365,7 @@ export function ProcurementsTable() {
         </div>
       ),
       cell: ({ row }) => (
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-1">
           <Button
             variant="ghost"
             className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-1 rounded-full h-6 w-6 sm:h-8 sm:w-8"
@@ -297,6 +374,24 @@ export function ProcurementsTable() {
           >
             <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="sr-only">Lihat detail</span>
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-purple-600 hover:text-purple-800 hover:bg-purple-50 p-1 rounded-full h-6 w-6 sm:h-8 sm:w-8"
+            size="icon"
+            onClick={() => handleOpenStatusModal(row.original)}
+          >
+            <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="sr-only">Update status</span>
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-green-600 hover:text-green-800 hover:bg-green-50 p-1 rounded-full h-6 w-6 sm:h-8 sm:w-8"
+            size="icon"
+            onClick={() => handleOpenTrackingModal(row.original)}
+          >
+            <TruckIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="sr-only">Update tracking</span>
           </Button>
         </div>
       ),
@@ -351,33 +446,40 @@ export function ProcurementsTable() {
     }
   }
 
+  const handleStatusFilterChange = (status: string) => {
+    setStatusFilter(status);
+    setCurrentPage(1);
+  };
+
+  const handleDepartmentFilterChange = (department: string) => {
+    setDepartmentFilter(department);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="space-y-3 sm:space-y-4 max-w-full">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-end gap-3 sm:gap-3">
-        <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-2 sm:gap-3">
+        <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
-                className="flex items-center text-xs sm:text-sm h-9 sm:h-9 px-2 sm:px-3"
+                className="flex items-center justify-center text-xs sm:text-sm h-9 px-2 sm:px-3 w-full sm:w-auto"
               >
-                <FilterIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5" />
-                <span className="truncate">
+                <FilterIcon className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1.5" />
+                <span className="ml-1.5 truncate max-w-[80px] sm:max-w-none">
                   {statusFilter
                     ? STATUS_CONFIG[statusFilter as keyof typeof STATUS_CONFIG]
                         ?.label || statusFilter.replace(/_/g, " ")
                     : "Status"}
                 </span>
-                <ChevronDownIcon className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
+                <ChevronDownIcon className="ml-1 h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem
-                onClick={() => {
-                  setStatusFilter("");
-                  setCurrentPage(1);
-                }}
+                onClick={() => handleStatusFilterChange("")}
                 className="cursor-pointer text-sm"
               >
                 Semua Status
@@ -385,10 +487,7 @@ export function ProcurementsTable() {
               {Object.entries(STATUS_CONFIG).map(([status, config]) => (
                 <DropdownMenuItem
                   key={status}
-                  onClick={() => {
-                    setStatusFilter(status);
-                    setCurrentPage(1);
-                  }}
+                  onClick={() => handleStatusFilterChange(status)}
                   className="flex items-center cursor-pointer text-sm"
                 >
                   <div
@@ -407,7 +506,44 @@ export function ProcurementsTable() {
               <Button
                 variant="outline"
                 size="sm"
-                className="text-xs sm:text-sm h-9 sm:h-9 px-2 sm:px-3"
+                className="flex items-center justify-center text-xs sm:text-sm h-9 px-2 sm:px-3 w-full sm:w-auto"
+              >
+                <FilterIcon className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1.5" />
+                <span className="ml-1.5 truncate max-w-[80px] sm:max-w-none">
+                  {departmentFilter
+                    ? DEPARTMENT_MAPPING[
+                        departmentFilter as keyof typeof DEPARTMENT_MAPPING
+                      ] || departmentFilter.replace(/_/g, " ")
+                    : "Dept"}
+                </span>
+                <ChevronDownIcon className="ml-1 h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem
+                onClick={() => handleDepartmentFilterChange("")}
+                className="cursor-pointer text-sm"
+              >
+                Semua Departemen
+              </DropdownMenuItem>
+              {Object.entries(DEPARTMENT_MAPPING).map(([key, label]) => (
+                <DropdownMenuItem
+                  key={key}
+                  onClick={() => handleDepartmentFilterChange(key)}
+                  className="flex items-center cursor-pointer text-sm"
+                >
+                  {label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center justify-center text-xs sm:text-sm h-9 px-2 sm:px-3 col-span-2 sm:col-span-1 w-full sm:w-auto"
               >
                 <span>Kolom</span>
                 <ChevronDownIcon className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
@@ -448,6 +584,8 @@ export function ProcurementsTable() {
                       ? "Satuan"
                       : column.id === "status"
                       ? "Status"
+                      : column.id === "trackingStatus"
+                      ? "Tracking"
                       : column.id === "createdAt"
                       ? "Tanggal"
                       : column.id}
@@ -494,6 +632,8 @@ export function ProcurementsTable() {
                       else if (header.id === "unit")
                         headerClass += " w-16 sm:w-24";
                       else if (header.id === "status")
+                        headerClass += " w-20 sm:w-32";
+                      else if (header.id === "trackingStatus")
                         headerClass += " w-20 sm:w-32";
                       else if (header.id === "createdAt")
                         headerClass += " w-16 sm:w-32";
@@ -592,6 +732,26 @@ export function ProcurementsTable() {
           onClose={handleCloseDetailModal}
         />
       )}
+
+      <ModalUpdateTrackingStatus
+        isOpen={trackingModalOpen}
+        onClose={handleCloseTrackingModal}
+        procurement={selectedProcurementForTracking}
+        selectedTrackingStatus={selectedTrackingStatus}
+        onTrackingStatusChange={setSelectedTrackingStatus}
+        onUpdate={handleUpdateTrackingStatus}
+        isUpdating={updateTrackingStatus.isPending}
+      />
+
+      <ModalUpdateStatus
+        isOpen={statusModalOpen}
+        onClose={handleCloseStatusModal}
+        procurement={selectedProcurementForStatus}
+        selectedStatus={selectedProcurementStatus}
+        onStatusChange={setSelectedProcurementStatus}
+        onUpdate={handleUpdateProcurementStatus}
+        isUpdating={updateProcurementStatus.isPending}
+      />
     </div>
   );
 }

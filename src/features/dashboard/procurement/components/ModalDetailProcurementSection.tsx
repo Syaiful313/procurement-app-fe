@@ -11,37 +11,12 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import useGetProcurementById from "@/hooks/api/dashboard-dirops/useGetProcurementById";
-import useUpdateProcurementStatus from "@/hooks/api/dashboard-dirops/useUpdateProcurementStatus";
 import useUpdateProcurementNote from "@/hooks/api/dashboard-procurement/useUpdateProcurementNote";
-import { ProcurementStatus } from "@/types/procurement";
+import { DEPARTMENT_MAPPING, STATUS_CONFIG } from "@/lib/constants";
 import { Loader2, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const STATUS_CONFIG = {
-  WAITING_CONFIRMATION: {
-    color: "bg-amber-50 text-amber-700 border-amber-200",
-    label: "Menunggu Konfirmasi",
-  },
-  PRIORITAS: {
-    color: "bg-orange-50 text-orange-700 border-orange-200",
-    label: "Prioritas",
-  },
-  URGENT: { color: "bg-red-50 text-red-700 border-red-200", label: "Mendesak" },
-  COMPLEMENT: {
-    color: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    label: "Melengkapi",
-  },
-  REJECTED: {
-    color: "bg-gray-50 text-gray-700 border-gray-200",
-    label: "Ditolak",
-  },
-};
 
-const DEPARTMENT_MAPPING = {
-  PURCHASE: "Pembelian",
-  FACTORY: "Pabrik",
-  OFFICE: "Kantor",
-};
 
 interface ModalDetailSectionProps {
   procurementId: number;
@@ -55,7 +30,6 @@ const ModalDetailSectionProcurement: React.FC<ModalDetailSectionProps> = ({
   onClose,
 }) => {
   const { data: procurement, isLoading } = useGetProcurementById(procurementId);
-  const updateStatusMutation = useUpdateProcurementStatus();
   const updateNoteMutation = useUpdateProcurementNote();
   const [note, setNote] = useState("");
 
@@ -64,13 +38,6 @@ const ModalDetailSectionProcurement: React.FC<ModalDetailSectionProps> = ({
       setNote(procurement.note || "");
     }
   }, [procurement]);
-
-  const handleUpdateStatus = (status: ProcurementStatus) => {
-    updateStatusMutation.mutate({
-      id: procurementId,
-      status,
-    });
-  };
 
   const handleUpdateNote = () => {
     if (note.trim() !== procurement?.note) {
@@ -106,42 +73,13 @@ const ModalDetailSectionProcurement: React.FC<ModalDetailSectionProps> = ({
     );
   };
 
-  const StatusButton = ({
-    status,
-    currentStatus,
-  }: {
-    status: ProcurementStatus;
-    currentStatus: ProcurementStatus;
-  }) => {
-    const config = STATUS_CONFIG[status];
-    const isActive = status === currentStatus;
-    const baseClasses = `px-3 py-1.5 text-xs font-medium rounded-md transition-colors`;
-
-    let className = baseClasses;
-    if (isActive) {
-      className += ` ${config.color} border-2`;
-    } else {
-      className += ` border ${config.color} opacity-70 hover:opacity-100`;
-    }
-
-    return (
-      <button
-        className={className}
-        onClick={() => handleUpdateStatus(status)}
-        disabled={isActive || updateStatusMutation.isPending}
-      >
-        {config.label}
-      </button>
-    );
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[550px] flex flex-col h-[90vh] sm:h-auto sm:max-h-[90vh] p-0 [&>button]:hidden">
         <DialogHeader className="p-6 pb-4 border-b shrink-0">
           <DialogTitle className="text-xl font-semibold">Detail Pengadaan</DialogTitle>
           <DialogDescription className="text-sm text-gray-500">
-            Lihat dan perbarui detail pengadaan.
+            Lihat detail pengadaan.
           </DialogDescription>
         </DialogHeader>
 
@@ -162,8 +100,6 @@ const ModalDetailSectionProcurement: React.FC<ModalDetailSectionProps> = ({
                     {procurement.username}
                   </div>
                 </div>
-
-                
 
                 {procurement.department && (
                   <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
@@ -250,19 +186,6 @@ const ModalDetailSectionProcurement: React.FC<ModalDetailSectionProps> = ({
                   <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
                     {formatDate(procurement.createdAt)}
                   </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 pt-3 border-t">
-                <div className="text-sm font-medium text-gray-800">Ubah Status</div>
-                <div className="flex flex-wrap gap-2">
-                  {Object.entries(STATUS_CONFIG).map(([status]) => (
-                    <StatusButton
-                      key={status}
-                      status={status as ProcurementStatus}
-                      currentStatus={procurement.status as ProcurementStatus}
-                    />
-                  ))}
                 </div>
               </div>
 
