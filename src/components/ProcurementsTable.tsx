@@ -19,6 +19,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import useGetProcurements from "@/hooks/api/dashboard-dirops/useGetProcurements";
+import {
+  DEPARTMENT_MAPPING,
+  STATUS_CONFIG,
+  TRACKING_STATUS_CONFIG,
+} from "@/lib/constants";
 import { Procurement } from "@/types/procurement";
 import {
   DndContext,
@@ -48,35 +53,6 @@ import {
 } from "@tanstack/react-table";
 import { ChevronDownIcon, Eye, FilterIcon } from "lucide-react";
 import React, { useState } from "react";
-
-const STATUS_CONFIG = {
-  WAITING_CONFIRMATION: {
-    color: "bg-amber-50 text-amber-700 border-amber-200",
-    label: "Menunggu Konfirmasi",
-  },
-  PRIORITAS: {
-    color: "bg-orange-50 text-orange-700 border-orange-200",
-    label: "Prioritas",
-  },
-  URGENT: {
-    color: "bg-red-50 text-red-700 border-red-200",
-    label: "Mendesak",
-  },
-  COMPLEMENT: {
-    color: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    label: "Melengkapi",
-  },
-  REJECTED: {
-    color: "bg-gray-50 text-gray-700 border-gray-200",
-    label: "Ditolak",
-  },
-};
-
-const DEPARTMENT_MAPPING = {
-  PURCHASE: "Pembelian",
-  FACTORY: "Pabrik",
-  OFFICE: "Kantor",
-} as const;
 
 function DraggableRow({ row }: { row: Row<Procurement> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
@@ -119,6 +95,8 @@ function DraggableRow({ row }: { row: Row<Procurement> }) {
           cellClass += " w-16 sm:w-24 text-xs sm:text-sm text-center";
         else if (cell.column.id === "status")
           cellClass += " w-20 sm:w-32 text-center";
+        else if (cell.column.id === "trackingStatus")
+          cellClass += " w-20 sm:w-32 text-center";
         else if (cell.column.id === "createdAt")
           cellClass += " w-16 sm:w-32 text-xs sm:text-sm text-center";
         else if (cell.column.id === "actions")
@@ -140,6 +118,7 @@ export function ProcurementsTable() {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [statusFilter, setStatusFilter] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState("");
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedProcurementId, setSelectedProcurementId] = useState<
     number | null
@@ -152,6 +131,7 @@ export function ProcurementsTable() {
     page: currentPage,
     take: pageSize,
     status: statusFilter,
+    department: departmentFilter,
   });
 
   const [data, setData] = React.useState<Procurement[]>([]);
@@ -194,6 +174,24 @@ export function ProcurementsTable() {
       >
         <span className="hidden sm:inline">{config.label}</span>
         <span className="sm:hidden">{mobileLabel}</span>
+      </Badge>
+    );
+  };
+
+  const TrackingStatusBadge = ({ status }: { status: string }) => {
+    const config = TRACKING_STATUS_CONFIG[
+      status as keyof typeof TRACKING_STATUS_CONFIG
+    ] || {
+      color: "bg-gray-50 text-gray-600 border-gray-200",
+      label: status.replace(/_/g, " "),
+    };
+
+    return (
+      <Badge
+        variant="outline"
+        className={`px-1.5 sm:px-3 py-0.5 sm:py-1 font-medium text-[10px] sm:text-xs whitespace-nowrap ${config.color}`}
+      >
+        <span>{config.label}</span>
       </Badge>
     );
   };
@@ -271,6 +269,20 @@ export function ProcurementsTable() {
       cell: ({ row }) => (
         <div className="flex justify-center">
           <StatusBadge status={row.original.status} />
+        </div>
+      ),
+    },
+    {
+      accessorKey: "trackingStatus",
+      header: () => (
+        <div className="text-center text-xs font-semibold uppercase tracking-wider">
+          <span className="hidden sm:inline">Tracking</span>
+          <span className="sm:hidden">Track</span>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex justify-center">
+          <TrackingStatusBadge status={row.original.trackingStatus} />
         </div>
       ),
     },
@@ -354,27 +366,32 @@ export function ProcurementsTable() {
     setCurrentPage(1);
   };
 
+  const handleDepartmentFilterChange = (department: string) => {
+    setDepartmentFilter(department);
+    setCurrentPage(1);
+  };
+
   return (
     <>
       <div className="space-y-3 sm:space-y-4 max-w-full">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-end gap-3 sm:gap-3">
-          <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex items-center text-xs sm:text-sm h-9 sm:h-9 px-2 sm:px-3"
+                  className="flex items-center justify-center text-xs sm:text-sm h-9 px-2 sm:px-3 w-full sm:w-auto"
                 >
-                  <FilterIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5" />
-                  <span className="truncate">
+                  <FilterIcon className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1.5" />
+                  <span className="ml-1.5 truncate max-w-[80px] sm:max-w-none">
                     {statusFilter
                       ? STATUS_CONFIG[
                           statusFilter as keyof typeof STATUS_CONFIG
                         ]?.label || statusFilter.replace(/_/g, " ")
                       : "Status"}
                   </span>
-                  <ChevronDownIcon className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
+                  <ChevronDownIcon className="ml-1 h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -406,7 +423,44 @@ export function ProcurementsTable() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-xs sm:text-sm h-9 sm:h-9 px-2 sm:px-3"
+                  className="flex items-center justify-center text-xs sm:text-sm h-9 px-2 sm:px-3 w-full sm:w-auto"
+                >
+                  <FilterIcon className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1.5" />
+                  <span className="ml-1.5 truncate max-w-[80px] sm:max-w-none">
+                    {departmentFilter
+                      ? DEPARTMENT_MAPPING[
+                          departmentFilter as keyof typeof DEPARTMENT_MAPPING
+                        ] || departmentFilter.replace(/_/g, " ")
+                      : "Dept"}
+                  </span>
+                  <ChevronDownIcon className="ml-1 h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem
+                  onClick={() => handleDepartmentFilterChange("")}
+                  className="cursor-pointer text-sm"
+                >
+                  Semua Departemen
+                </DropdownMenuItem>
+                {Object.entries(DEPARTMENT_MAPPING).map(([key, label]) => (
+                  <DropdownMenuItem
+                    key={key}
+                    onClick={() => handleDepartmentFilterChange(key)}
+                    className="flex items-center cursor-pointer text-sm"
+                  >
+                    {label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center justify-center text-xs sm:text-sm h-9 px-2 sm:px-3 col-span-2 sm:col-span-1 w-full sm:w-auto"
                 >
                   <span>Kolom</span>
                   <ChevronDownIcon className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
@@ -447,6 +501,8 @@ export function ProcurementsTable() {
                         ? "Satuan"
                         : column.id === "status"
                         ? "Status"
+                        : column.id === "trackingStatus"
+                        ? "Tracking"
                         : column.id === "createdAt"
                         ? "Tanggal"
                         : column.id}
@@ -494,6 +550,8 @@ export function ProcurementsTable() {
                         else if (header.id === "unit")
                           headerClass += " w-16 sm:w-24";
                         else if (header.id === "status")
+                          headerClass += " w-20 sm:w-32";
+                        else if (header.id === "trackingStatus")
                           headerClass += " w-20 sm:w-32";
                         else if (header.id === "createdAt")
                           headerClass += " w-16 sm:w-32";
