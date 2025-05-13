@@ -15,6 +15,10 @@ export interface Procurement {
   note: string;
   date: string;
   department: "PURCHASE" | "FACTORY" | "OFFICE";
+  itemName: string;
+  specification: string;
+  quantity: number;
+  unit: string;
   createdAt: string;
   updatedAt: string;
   user: User

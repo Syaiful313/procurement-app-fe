@@ -1,7 +1,7 @@
+import { ProcurementsTable } from "@/components/ProcurementsTable";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebarManager } from "./components/AppSidebarManager";
 import { SiteHeaderManager } from "./components/SiteHeaderManager";
-import { ProcurementsManagerTable } from "./components/ProcurementsManagerTable";
 
 export default function DashboardManagerPage() {
   return (
@@ -17,7 +17,7 @@ export default function DashboardManagerPage() {
               buat. Anda dapat melihat pengadaan barang karyawan di sini.
             </p>
           </div>
-          <ProcurementsManagerTable />
+          <ProcurementsTable />
         </div>
       </SidebarInset>
     </SidebarProvider>

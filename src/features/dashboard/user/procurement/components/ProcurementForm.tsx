@@ -3,7 +3,13 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { useFormik } from "formik";
@@ -12,7 +18,11 @@ import useCreateProcurement from "@/hooks/api/dashboard-user/useCreateprocuremen
 import { CreateProcurementSchema } from "./schemas";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 const ProcurementForm = () => {
@@ -25,6 +35,10 @@ const ProcurementForm = () => {
       description: "",
       date: new Date(),
       department: "" as "" | "PURCHASE" | "FACTORY" | "OFFICE",
+      itemName: "",
+      specification: "",
+      quantity: "",
+      unit: "",
     },
     validationSchema: CreateProcurementSchema,
     onSubmit: async (values) => {
@@ -35,6 +49,10 @@ const ProcurementForm = () => {
           description: values.description,
           date: values.date,
           department: values.department as "PURCHASE" | "FACTORY" | "OFFICE",
+          itemName: values.itemName,
+          specification: values.specification,
+          quantity: Number(values.quantity),
+          unit: values.unit,
         });
       } finally {
         setIsSubmitting(false);
@@ -78,27 +96,7 @@ const ProcurementForm = () => {
           )}
         </div>
 
-        <div className="grid gap-3">
-          <Label htmlFor="description" className="font-medium">
-            Keterangan
-          </Label>
-          <Textarea
-            id="description"
-            name="description"
-            placeholder="Masukkan keterangan"
-            value={formik.values.description}
-            required
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className="min-h-[120px] resize-none w-full"
-            disabled={isSubmitting}
-          />
-          {!!formik.touched.description && !!formik.errors.description && (
-            <p className="text-destructive text-sm">
-              {formik.errors.description}
-            </p>
-          )}
-        </div>
+        
 
         <div className="grid gap-3">
           <Label htmlFor="date" className="font-medium">
@@ -163,6 +161,115 @@ const ProcurementForm = () => {
           {!!formik.touched.department && !!formik.errors.department && (
             <p className="text-destructive text-sm">
               {formik.errors.department}
+            </p>
+          )}
+        </div>
+
+        <div className="grid gap-3">
+          <Label htmlFor="itemName" className="font-medium">
+            Nama Barang
+          </Label>
+          <Input
+            id="itemName"
+            name="itemName"
+            type="text"
+            placeholder="Masukkan nama barang"
+            value={formik.values.itemName}
+            required
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="w-full"
+            disabled={isSubmitting}
+          />
+          {!!formik.touched.itemName && !!formik.errors.itemName && (
+            <p className="text-destructive text-sm">{formik.errors.itemName}</p>
+          )}
+        </div>
+
+        <div className="grid gap-3">
+          <Label htmlFor="specification" className="font-medium">
+            Spesifikasi
+          </Label>
+          <Textarea
+            id="specification"
+            name="specification"
+            placeholder="Masukkan spesifikasi barang"
+            value={formik.values.specification}
+            required
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="min-h-[80px] resize-none w-full"
+            disabled={isSubmitting}
+          />
+          {!!formik.touched.specification && !!formik.errors.specification && (
+            <p className="text-destructive text-sm">
+              {formik.errors.specification}
+            </p>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-3">
+            <Label htmlFor="quantity" className="font-medium">
+              Jumlah
+            </Label>
+            <Input
+              id="quantity"
+              name="quantity"
+              type="number"
+              placeholder="Masukkan jumlah"
+              value={formik.values.quantity}
+              required
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className="w-full"
+              disabled={isSubmitting}
+            />
+            {!!formik.touched.quantity && !!formik.errors.quantity && (
+              <p className="text-destructive text-sm">{formik.errors.quantity}</p>
+            )}
+          </div>
+
+          <div className="grid gap-3">
+            <Label htmlFor="unit" className="font-medium">
+              Satuan
+            </Label>
+            <Input
+              id="unit"
+              name="unit"
+              type="text"
+              placeholder="Masukkan satuan (pcs, kg, dll)"
+              value={formik.values.unit}
+              required
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className="w-full"
+              disabled={isSubmitting}
+            />
+            {!!formik.touched.unit && !!formik.errors.unit && (
+              <p className="text-destructive text-sm">{formik.errors.unit}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="grid gap-3">
+          <Label htmlFor="description" className="font-medium">
+            Keterangan
+          </Label>
+          <Textarea
+            id="description"
+            name="description"
+            placeholder="Masukkan keterangan"
+            value={formik.values.description}
+            required
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="min-h-[120px] resize-none w-full"
+            disabled={isSubmitting}
+          />
+          {!!formik.touched.description && !!formik.errors.description && (
+            <p className="text-destructive text-sm">
+              {formik.errors.description}
             </p>
           )}
         </div>
