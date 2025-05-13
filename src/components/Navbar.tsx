@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "./ui/button";
+import { Package } from "lucide-react";
 
 const Navbar = () => {
   return (
@@ -7,10 +8,8 @@ const Navbar = () => {
       <div className="container mx-auto max-w-screen-xl flex h-16 items-center justify-between px-4 md:px-6">
         <div className="flex items-center">
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-black dark:bg-white rounded-lg flex items-center justify-center">
-              <span className="text-white dark:text-black font-bold text-lg">
-                S
-              </span>
+            <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-md sm:h-10 sm:w-10">
+              <Package className="h-5 w-5 text-white sm:h-6 sm:w-6" />
             </div>
             <p className="text-xl md:text-2xl font-bold text-black dark:text-white">
               Sabar App

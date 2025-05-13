@@ -19,7 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -60,7 +59,6 @@ import {
 } from "@tanstack/react-table";
 import { ChevronDownIcon, FilterIcon, Loader2, Trash2 } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
-import { useDebounceValue } from "usehooks-ts";
 import RegisterModal from "./RegisterModal";
 
 const ROLE_CONFIG = {
@@ -127,8 +125,6 @@ function DraggableRow({ row }: { row: Row<User> }) {
 }
 
 export function UsersTable() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch] = useDebounceValue(searchQuery, 400);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [rowSelection, setRowSelection] = useState({});
@@ -149,7 +145,6 @@ export function UsersTable() {
   } = useGetUsers({
     page: currentPage,
     take: pageSize,
-    search: debouncedSearch,
     role: roleFilter,
   });
 
@@ -359,18 +354,7 @@ export function UsersTable() {
   return (
     <>
       <div className="space-y-4 sm:space-y-4 max-w-full">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-3">
-          <div className="flex-1 max-w-full lg:max-w-md">
-            <Input
-              placeholder="Cari pengguna..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full text-sm h-10"
-            />
-          </div>
+        <div className="flex flex-col lg:flex-row lg:items-center justify-end gap-3 sm:gap-3">
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-1 sm:flex-initial">
               <RegisterModal onSuccess={handleRegisterSuccess} />
