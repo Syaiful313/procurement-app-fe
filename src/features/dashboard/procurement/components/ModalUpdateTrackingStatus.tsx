@@ -59,54 +59,44 @@ export default function ModalUpdateTrackingStatus({
 }: ModalUpdateTrackingStatusProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[450px] flex flex-col h-[90vh] sm:h-auto sm:max-h-[90vh] p-0 [&>button]:hidden">
-        <DialogHeader className="p-6 pb-4 border-b shrink-0">
-          <DialogTitle className="text-xl font-semibold">
+      <DialogContent className="w-[95%] max-w-[95%] sm:max-w-[450px] flex flex-col h-[90vh] sm:h-auto sm:max-h-[90vh] p-0 gap-0 rounded-lg sm:rounded-xl overflow-hidden [&>button]:hidden mx-auto">
+        <DialogHeader className="p-4 sm:p-6 pb-3 sm:pb-4 border-b shrink-0">
+          <DialogTitle className="text-lg sm:text-xl font-semibold">
             Update Tracking Status
           </DialogTitle>
-          <DialogDescription className="text-sm text-gray-500">
+          <DialogDescription className="text-xs sm:text-sm text-gray-500 mt-1">
             Perbarui status tracking untuk pengadaan barang.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto px-6">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6">
           {procurement ? (
-            <div className="space-y-6 py-6">
-              <div className="space-y-4">
+            <div className="space-y-4 sm:space-y-6 py-4 sm:py-6">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
-                  <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
-                    <span>Nama Barang</span>
-                    <span>:</span>
-                  </div>
-                  <div className="font-medium text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
-                    {procurement.itemName}
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
-                  <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
+                  <div className="font-medium text-gray-600 text-sm mb-1 sm:text-base sm:mb-0 sm:flex sm:justify-between sm:pr-2">
                     <span>Pemohon</span>
-                    <span>:</span>
+                    <span className="hidden sm:inline">:</span>
                   </div>
-                  <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
+                  <div className="text-gray-900 text-sm sm:text-base pl-0 sm:pl-0 sm:col-span-2">
                     {procurement.username}
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
-                  <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
+                <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center pt-2 sm:pt-0">
+                  <div className="font-medium text-gray-600 text-sm mb-1 sm:text-base sm:mb-0 sm:flex sm:justify-between sm:pr-2">
                     <span>Status Saat Ini</span>
-                    <span>:</span>
+                    <span className="hidden sm:inline">:</span>
                   </div>
-                  <div className="pl-4 sm:pl-0 sm:col-span-2">
+                  <div className="pl-0 sm:pl-0 sm:col-span-2">
                     <TrackingStatusBadge status={procurement.trackingStatus} />
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 border-t">
-                <div className="space-y-3">
-                  <label className="text-sm font-medium text-gray-800">
+              <div className="pt-3 sm:pt-4 border-t">
+                <div className="space-y-2 sm:space-y-3">
+                  <label className="text-xs sm:text-sm font-medium text-gray-800 block">
                     Pilih Status Tracking Baru:
                   </label>
                   <Select
@@ -115,13 +105,13 @@ export default function ModalUpdateTrackingStatus({
                       onTrackingStatusChange(value as TrackingStatus)
                     }
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full text-sm">
                       <SelectValue placeholder="Pilih status tracking" />
                     </SelectTrigger>
                     <SelectContent>
                       {Object.entries(TRACKING_STATUS_CONFIG).map(
                         ([value, config]) => (
-                          <SelectItem key={value} value={value}>
+                          <SelectItem key={value} value={value} className="text-sm">
                             {config.label}
                           </SelectItem>
                         )
@@ -132,30 +122,30 @@ export default function ModalUpdateTrackingStatus({
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-center py-8">
-              <p className="text-gray-500">Data pengadaan tidak ditemukan</p>
+            <div className="flex items-center justify-center py-6 sm:py-8">
+              <p className="text-gray-500 text-sm sm:text-base">Data pengadaan tidak ditemukan</p>
             </div>
           )}
         </div>
 
-        <DialogFooter className="p-6 pt-4 border-t shrink-0">
-          <div className="flex gap-3 w-full sm:w-auto">
+        <DialogFooter className="p-4 sm:p-6 pt-3 sm:pt-4 border-t shrink-0">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:justify-end">
             <Button
               variant="outline"
               onClick={onClose}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto text-sm h-9 sm:h-10"
             >
               Batal
             </Button>
             <Button
               onClick={onUpdate}
-              disabled={!selectedTrackingStatus || isUpdating}
-              className="w-full sm:w-auto"
+              disabled={!selectedTrackingStatus || isUpdating || selectedTrackingStatus === procurement?.trackingStatus}
+              className="w-full sm:w-auto text-sm h-9 sm:h-10"
             >
               {isUpdating ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Memperbarui...
+                  <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                  <span>Memperbarui...</span>
                 </>
               ) : (
                 "Update"

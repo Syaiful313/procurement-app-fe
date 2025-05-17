@@ -7,7 +7,7 @@ const useGetProcurementById = (id: number) => {
   const { axiosInstance } = useAxios();
 
   return useQuery({
-    queryKey: ["procurement", "detail", id],
+    queryKey: ["user-procurements", "detail", id],
     queryFn: async () => {
       const { data } = await axiosInstance.get<Procurement>(`/dirops/${id}`);
       return data;

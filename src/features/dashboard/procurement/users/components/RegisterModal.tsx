@@ -44,7 +44,16 @@ export default function RegisterModal({ onSuccess }: RegisterModalProps) {
     },
     validationSchema: registerSchema,
     onSubmit: async (values) => {
-      await register(values);
+      try {
+        await register(values);
+        setOpen(false);
+        formik.resetForm();
+        if (onSuccess) {
+          onSuccess();
+        }
+      } catch (error) {
+        console.error("Registration failed:", error);
+      }
     },
   });
 
@@ -64,7 +73,7 @@ export default function RegisterModal({ onSuccess }: RegisterModalProps) {
           Tambah Pengguna
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] [&>button]:hidden">
         <DialogHeader>
           <DialogTitle>Tambah Pengguna Baru</DialogTitle>
           <DialogDescription>
@@ -178,6 +187,13 @@ export default function RegisterModal({ onSuccess }: RegisterModalProps) {
             </div>
           </div>
           <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
+              Batal
+            </Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? "Menyimpan..." : "Tambah Pengguna"}
             </Button>

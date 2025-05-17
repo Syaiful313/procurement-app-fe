@@ -111,7 +111,7 @@ export default function LoginPage() {
               )}
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col pt-2 pb-6 sm:pt-4 sm:pb-8">
+          <CardFooter className="flex flex-col pb-6 pt-4 sm:pb-8">
             <Button
               type="submit"
               className="h-10 w-full sm:h-11"

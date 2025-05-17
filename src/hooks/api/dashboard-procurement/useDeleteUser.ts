@@ -1,5 +1,5 @@
 "use client";
-import { axiosInstance } from "@/lib/axios";
+import useAxios from "@/hooks/useAxios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ interface DeleteUserResponse {
 
 const useDeleteUser = () => {
   const queryClient = useQueryClient();
+  const { axiosInstance } = useAxios(); // Gunakan hook
 
   return useMutation({
     mutationFn: async (userId: number): Promise<DeleteUserResponse> => {

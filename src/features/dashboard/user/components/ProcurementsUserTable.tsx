@@ -46,78 +46,104 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import {
   ColumnDef,
-  Row,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { ChevronDownIcon, Eye, FilterIcon } from "lucide-react";
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import React, { useEffect, useMemo, useState } from "react";
 
-function DraggableRow({ row }: { row: Row<Procurement> }) {
+function DraggableRow({
+  row,
+  isEmptyRow = false,
+  columnCount = 7,
+}: {
+  row: any;
+  isEmptyRow?: boolean;
+  columnCount?: number;
+}) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
-    id: row.original.id,
+    id: isEmptyRow ? `empty-${Math.random()}` : row.original.id,
+    disabled: isEmptyRow,
   });
 
   return (
     <TableRow
-      data-state={row.getIsSelected() && "selected"}
+      data-state={
+        !isEmptyRow && row.getIsSelected && row.getIsSelected()
+          ? "selected"
+          : ""
+      }
       data-dragging={isDragging}
-      ref={setNodeRef}
+      ref={isEmptyRow ? undefined : setNodeRef}
       className="relative border-b hover:bg-slate-50 data-[dragging=true]:z-10 data-[dragging=true]:bg-slate-100 data-[dragging=true]:opacity-90"
       style={{
         transform: CSS.Transform.toString(transform),
         transition: transition,
       }}
     >
-      {row.getVisibleCells().map((cell) => {
-        let cellClass = "py-2 sm:py-3 px-2 sm:px-4";
+      {isEmptyRow
+        ? Array.from({ length: columnCount }).map((_, index) => (
+            <TableCell
+              key={`empty-cell-${index}`}
+              className="py-2 sm:py-3 px-2 sm:px-4 border-l border-r border-gray-200"
+            >
+              &nbsp;
+            </TableCell>
+          ))
+        : row.getVisibleCells().map((cell: any) => {
+            let cellClass =
+              "py-2 sm:py-3 px-2 sm:px-4 border-l border-r border-gray-200";
 
-        if (cell.column.id === "index")
-          cellClass += " w-8 sm:w-12 text-xs sm:text-sm text-center";
-        else if (cell.column.id === "username")
-          cellClass += " w-20 sm:w-32 text-xs sm:text-sm font-medium";
-        else if (cell.column.id === "description")
-          cellClass +=
-            " min-w-[100px] max-w-[150px] sm:max-w-[200px] text-xs sm:text-sm";
-        else if (cell.column.id === "department")
-          cellClass +=
-            " min-w-[80px] max-w-[100px] sm:max-w-[150px] text-xs sm:text-sm";
-        else if (cell.column.id === "itemName")
-          cellClass +=
-            " min-w-[80px] max-w-[120px] sm:max-w-[180px] text-xs sm:text-sm";
-        else if (cell.column.id === "specification")
-          cellClass +=
-            " min-w-[100px] max-w-[150px] sm:max-w-[200px] text-xs sm:text-sm";
-        else if (cell.column.id === "quantity")
-          cellClass += " w-16 sm:w-24 text-xs sm:text-sm text-center";
-        else if (cell.column.id === "unit")
-          cellClass += " w-16 sm:w-24 text-xs sm:text-sm text-center";
-        else if (cell.column.id === "status")
-          cellClass += " w-20 sm:w-32 text-center";
-        else if (cell.column.id === "trackingStatus")
-          cellClass += " w-20 sm:w-32 text-center";
-        else if (cell.column.id === "createdAt")
-          cellClass += " w-16 sm:w-32 text-xs sm:text-sm text-center";
-        else if (cell.column.id === "actions")
-          cellClass += " w-10 sm:w-16 text-center";
+            if (cell.column.id === "index")
+              cellClass += " w-8 sm:w-12 text-xs sm:text-sm text-center";
+            else if (cell.column.id === "username")
+              cellClass += " w-20 sm:w-32 text-xs sm:text-sm font-medium";
+            else if (cell.column.id === "description")
+              cellClass +=
+                " min-w-[100px] max-w-[150px] sm:max-w-[200px] text-xs sm:text-sm";
+            else if (cell.column.id === "department")
+              cellClass +=
+                " min-w-[80px] max-w-[100px] sm:max-w-[150px] text-xs sm:text-sm";
+            else if (cell.column.id === "itemName")
+              cellClass +=
+                " min-w-[80px] max-w-[120px] sm:max-w-[180px] text-xs sm:text-sm";
+            else if (cell.column.id === "specification")
+              cellClass +=
+                " min-w-[100px] max-w-[150px] sm:max-w-[200px] text-xs sm:text-sm";
+            else if (cell.column.id === "quantity")
+              cellClass += " w-16 sm:w-24 text-xs sm:text-sm text-center";
+            else if (cell.column.id === "unit")
+              cellClass += " w-16 sm:w-24 text-xs sm:text-sm text-center";
+            else if (cell.column.id === "status")
+              cellClass += " w-20 sm:w-32 text-center";
+            else if (cell.column.id === "trackingStatus")
+              cellClass += " w-20 sm:w-32 text-center";
+            else if (cell.column.id === "createdAt")
+              cellClass += " w-16 sm:w-32 text-xs sm:text-sm text-center";
+            else if (cell.column.id === "actions")
+              cellClass += " w-10 sm:w-16 text-center";
 
-        return (
-          <TableCell key={cell.id} className={cellClass}>
-            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-          </TableCell>
-        );
-      })}
+            return (
+              <TableCell key={cell.id} className={cellClass}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </TableCell>
+            );
+          })}
     </TableRow>
   );
 }
 
 export function ProcurementsUserTable() {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [queryParams, setQueryParams] = useQueryStates({
+    page: parseAsInteger.withDefault(1),
+    status: parseAsString.withDefault(""),
+  });
+
   const [pageSize] = useState(10);
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState({});
-  const [statusFilter, setStatusFilter] = useState("");
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedProcurementId, setSelectedProcurementId] = useState<
     number | null
@@ -128,9 +154,9 @@ export function ProcurementsUserTable() {
     isLoading,
     error,
   } = useGetUserProcurements({
-    page: currentPage,
+    page: queryParams.page,
     take: pageSize,
-    status: statusFilter,
+    status: queryParams.status,
   });
 
   const [data, setData] = useState<Procurement[]>([]);
@@ -205,12 +231,23 @@ export function ProcurementsUserTable() {
     setSelectedProcurementId(null);
   };
 
+  const handleStatusFilterChange = (status: string) => {
+    setQueryParams({
+      status,
+      page: 1,
+    });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setQueryParams({ page: newPage });
+  };
+
   const columns: ColumnDef<Procurement>[] = [
     {
       accessorKey: "index",
       header: () => (
         <div className="text-center text-xs font-semibold uppercase tracking-wider">
-          No
+          No.
         </div>
       ),
       cell: ({ row }) => (
@@ -360,6 +397,24 @@ export function ProcurementsUserTable() {
     }
   }
 
+  const renderEmptyRows = (count: number) => {
+    return Array.from({ length: count }).map((_, index) => {
+      const emptyRow = {
+        id: `empty-${index}`,
+        getVisibleCells: () => [],
+      };
+
+      return (
+        <DraggableRow
+          key={`empty-row-${index}`}
+          row={emptyRow}
+          isEmptyRow={true}
+          columnCount={columns.length}
+        />
+      );
+    });
+  };
+
   return (
     <>
       <div className="space-y-3 sm:space-y-4 max-w-full">
@@ -374,10 +429,10 @@ export function ProcurementsUserTable() {
                 >
                   <FilterIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5" />
                   <span className="truncate">
-                    {statusFilter
+                    {queryParams.status
                       ? STATUS_CONFIG[
-                          statusFilter as keyof typeof STATUS_CONFIG
-                        ]?.label || statusFilter.replace(/_/g, " ")
+                          queryParams.status as keyof typeof STATUS_CONFIG
+                        ]?.label || queryParams.status.replace(/_/g, " ")
                       : "Status"}
                   </span>
                   <ChevronDownIcon className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
@@ -385,10 +440,7 @@ export function ProcurementsUserTable() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
-                  onClick={() => {
-                    setStatusFilter("");
-                    setCurrentPage(1);
-                  }}
+                  onClick={() => handleStatusFilterChange("")}
                   className="cursor-pointer text-sm"
                 >
                   Semua Status
@@ -396,10 +448,7 @@ export function ProcurementsUserTable() {
                 {Object.entries(STATUS_CONFIG).map(([status, config]) => (
                   <DropdownMenuItem
                     key={status}
-                    onClick={() => {
-                      setStatusFilter(status);
-                      setCurrentPage(1);
-                    }}
+                    onClick={() => handleStatusFilterChange(status)}
                     className="flex items-center cursor-pointer text-sm"
                   >
                     <div
@@ -489,7 +538,7 @@ export function ProcurementsUserTable() {
                     >
                       {headerGroup.headers.map((header) => {
                         let headerClass =
-                          "h-8 sm:h-10 px-2 sm:px-4 text-gray-700";
+                          "h-8 sm:h-10 px-2 sm:px-4 text-gray-700 border-l border-r border-gray-200";
 
                         if (header.id === "index")
                           headerClass += " w-8 sm:w-12";
@@ -539,7 +588,7 @@ export function ProcurementsUserTable() {
                     <TableRow>
                       <TableCell
                         colSpan={columns.length}
-                        className="h-24 text-center"
+                        className="h-24 text-center border-l border-r border-gray-200"
                       >
                         <div className="flex justify-center items-center">
                           <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-t-blue-500 rounded-full animate-spin"></div>
@@ -553,7 +602,7 @@ export function ProcurementsUserTable() {
                     <TableRow>
                       <TableCell
                         colSpan={columns.length}
-                        className="h-24 text-center text-red-500"
+                        className="h-24 text-center text-red-500 border-l border-r border-gray-200"
                       >
                         <div className="flex flex-col items-center gap-1">
                           <span className="text-sm">Kesalahan memuat data</span>
@@ -563,26 +612,26 @@ export function ProcurementsUserTable() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ) : table.getRowModel().rows?.length ? (
+                  ) : (
                     <SortableContext
                       items={dataIds}
                       strategy={verticalListSortingStrategy}
                     >
-                      {table.getRowModel().rows.map((row) => (
-                        <DraggableRow key={row.id} row={row} />
-                      ))}
+                      {table.getRowModel().rows?.length ? (
+                        <>
+                          {table.getRowModel().rows.map((row) => (
+                            <DraggableRow key={row.id} row={row} />
+                          ))}
+                          {/* Tambahkan baris kosong jika jumlah data kurang dari 8 */}
+                          {table.getRowModel().rows.length < 8 &&
+                            renderEmptyRows(
+                              8 - table.getRowModel().rows.length
+                            )}
+                        </>
+                      ) : (
+                        renderEmptyRows(8)
+                      )}
                     </SortableContext>
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columns.length}
-                        className="h-24 text-center text-gray-500"
-                      >
-                        <span className="text-sm">
-                          Tidak ada data pengadaan ditemukan
-                        </span>
-                      </TableCell>
-                    </TableRow>
                   )}
                 </TableBody>
               </Table>
@@ -595,7 +644,7 @@ export function ProcurementsUserTable() {
                 page={procurementsData.meta.page}
                 take={procurementsData.meta.take}
                 total={procurementsData.meta.total}
-                onChangePage={setCurrentPage}
+                onChangePage={handlePageChange}
               />
             </div>
           )}

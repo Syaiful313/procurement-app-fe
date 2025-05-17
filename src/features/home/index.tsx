@@ -29,7 +29,7 @@ export default function HomePage() {
                     Masuk ke Sistem
                   </Button>
                 </Link>
-                <Link href="/about">
+                <Link href="/">
                   <Button
                     variant="outline"
                     size="lg"

@@ -1,7 +1,7 @@
 "use client";
 
 import { axiosInstance } from "@/lib/axios";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -16,14 +16,17 @@ interface RegisterPayload {
 
 const useRegister = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (payload: RegisterPayload) => {
       const data = await axiosInstance.post("/auth/register", payload);
       return data;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Register successfully");
+      await queryClient.invalidateQueries({ queryKey: ["users"] });
+
       router.push("/dashboard/procurement/users");
     },
     onError: (error: AxiosError<any>) => {
