@@ -3,7 +3,6 @@ import useAxios from "@/hooks/useAxios";
 import { TrackingStatus } from "@/types/procurement";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface UpdateTrackingStatusPayload {
@@ -12,7 +11,6 @@ interface UpdateTrackingStatusPayload {
 }
 
 const useUpdateTrackingStatus = () => {
-  const router = useRouter();
   const { axiosInstance } = useAxios();
   const queryClient = useQueryClient();
 
@@ -33,7 +31,6 @@ const useUpdateTrackingStatus = () => {
       toast.success("Tracking status berhasil diperbarui");
       await queryClient.invalidateQueries({ queryKey: ["procurements"] });
       await queryClient.invalidateQueries({ queryKey: ["procurement", data.id] });
-      router.push("/dashboard/procurement");
     },
     onError: (error: AxiosError<any>) => {
       toast.error(

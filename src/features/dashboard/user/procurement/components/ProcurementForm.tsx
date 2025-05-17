@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useFormik } from "formik";
 import { useState } from "react";
@@ -25,6 +25,14 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
+interface ProcurementItem {
+  itemName: string;
+  specification: string;
+  quantity: string;
+  unit: string;
+  description: string; // Tambahkan description per item
+}
+
 const ProcurementForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createProcurement = useCreateProcurement();
@@ -32,13 +40,17 @@ const ProcurementForm = () => {
   const formik = useFormik({
     initialValues: {
       username: "",
-      description: "",
       date: new Date(),
       department: "" as "" | "PURCHASE" | "FACTORY" | "OFFICE",
-      itemName: "",
-      specification: "",
-      quantity: "",
-      unit: "",
+      items: [
+        {
+          itemName: "",
+          specification: "",
+          quantity: "",
+          unit: "",
+          description: "", // Tambahkan description di initial value
+        },
+      ] as ProcurementItem[],
     },
     validationSchema: CreateProcurementSchema,
     onSubmit: async (values) => {
@@ -46,19 +58,40 @@ const ProcurementForm = () => {
       try {
         await createProcurement.mutate({
           username: values.username,
-          description: values.description,
           date: values.date,
           department: values.department as "PURCHASE" | "FACTORY" | "OFFICE",
-          itemName: values.itemName,
-          specification: values.specification,
-          quantity: Number(values.quantity),
-          unit: values.unit,
+          items: values.items.map((item) => ({
+            itemName: item.itemName,
+            specification: item.specification,
+            quantity: Number(item.quantity),
+            unit: item.unit,
+            description: item.description, // Tambahkan description per item
+          })),
         });
       } finally {
         setIsSubmitting(false);
       }
     },
   });
+
+  const addItem = () => {
+    formik.setFieldValue("items", [
+      ...formik.values.items,
+      {
+        itemName: "",
+        specification: "",
+        quantity: "",
+        unit: "",
+        description: "", // Tambahkan description saat add item
+      },
+    ]);
+  };
+
+  const removeItem = (index: number) => {
+    const newItems = [...formik.values.items];
+    newItems.splice(index, 1);
+    formik.setFieldValue("items", newItems);
+  };
 
   return (
     <form
@@ -95,8 +128,6 @@ const ProcurementForm = () => {
             <p className="text-destructive text-sm">{formik.errors.username}</p>
           )}
         </div>
-
-        
 
         <div className="grid gap-3">
           <Label htmlFor="date" className="font-medium">
@@ -165,113 +196,202 @@ const ProcurementForm = () => {
           )}
         </div>
 
-        <div className="grid gap-3">
-          <Label htmlFor="itemName" className="font-medium">
-            Nama Barang
-          </Label>
-          <Input
-            id="itemName"
-            name="itemName"
-            type="text"
-            placeholder="Masukkan nama barang"
-            value={formik.values.itemName}
-            required
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className="w-full"
-            disabled={isSubmitting}
-          />
-          {!!formik.touched.itemName && !!formik.errors.itemName && (
-            <p className="text-destructive text-sm">{formik.errors.itemName}</p>
-          )}
-        </div>
-
-        <div className="grid gap-3">
-          <Label htmlFor="specification" className="font-medium">
-            Spesifikasi
-          </Label>
-          <Textarea
-            id="specification"
-            name="specification"
-            placeholder="Masukkan spesifikasi barang"
-            value={formik.values.specification}
-            required
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className="min-h-[80px] resize-none w-full"
-            disabled={isSubmitting}
-          />
-          {!!formik.touched.specification && !!formik.errors.specification && (
-            <p className="text-destructive text-sm">
-              {formik.errors.specification}
-            </p>
-          )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="grid gap-3">
-            <Label htmlFor="quantity" className="font-medium">
-              Jumlah
-            </Label>
-            <Input
-              id="quantity"
-              name="quantity"
-              type="number"
-              placeholder="Masukkan jumlah"
-              value={formik.values.quantity}
-              required
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className="w-full"
+        {/* Items Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label className="text-lg font-medium">Daftar Barang</Label>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addItem}
               disabled={isSubmitting}
-            />
-            {!!formik.touched.quantity && !!formik.errors.quantity && (
-              <p className="text-destructive text-sm">{formik.errors.quantity}</p>
-            )}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Tambah Barang
+            </Button>
           </div>
 
-          <div className="grid gap-3">
-            <Label htmlFor="unit" className="font-medium">
-              Satuan
-            </Label>
-            <Input
-              id="unit"
-              name="unit"
-              type="text"
-              placeholder="Masukkan satuan (pcs, kg, dll)"
-              value={formik.values.unit}
-              required
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className="w-full"
-              disabled={isSubmitting}
-            />
-            {!!formik.touched.unit && !!formik.errors.unit && (
-              <p className="text-destructive text-sm">{formik.errors.unit}</p>
-            )}
-          </div>
-        </div>
+          {formik.values.items.map((item, index) => (
+            <div
+              key={index}
+              className="space-y-4 rounded-lg border p-4 relative"
+            >
+              {formik.values.items.length > 1 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeItem(index)}
+                  className="absolute right-2 top-2"
+                  disabled={isSubmitting}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
 
-        <div className="grid gap-3">
-          <Label htmlFor="description" className="font-medium">
-            Keterangan
-          </Label>
-          <Textarea
-            id="description"
-            name="description"
-            placeholder="Masukkan keterangan"
-            value={formik.values.description}
-            required
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className="min-h-[120px] resize-none w-full"
-            disabled={isSubmitting}
-          />
-          {!!formik.touched.description && !!formik.errors.description && (
-            <p className="text-destructive text-sm">
-              {formik.errors.description}
-            </p>
-          )}
+              <div className="font-medium text-sm">
+                Barang {index + 1}
+              </div>
+
+              <div className="grid gap-3">
+                <Label htmlFor={`items.${index}.itemName`} className="font-medium">
+                  Nama Barang
+                </Label>
+                <Input
+                  id={`items.${index}.itemName`}
+                  name={`items.${index}.itemName`}
+                  type="text"
+                  placeholder="Masukkan nama barang"
+                  value={item.itemName}
+                  required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="w-full"
+                  disabled={isSubmitting}
+                />
+                {formik.touched.items?.[index]?.itemName &&
+                  typeof formik.errors.items?.[index] === "object" &&
+                  formik.errors.items?.[index] !== null &&
+                  "itemName" in formik.errors.items[index] && (
+                    <p className="text-destructive text-sm">
+                      {
+                        (formik.errors.items[index] as { itemName?: string })
+                          .itemName
+                      }
+                    </p>
+                  )}
+              </div>
+
+              <div className="grid gap-3">
+                <Label
+                  htmlFor={`items.${index}.specification`}
+                  className="font-medium"
+                >
+                  Spesifikasi
+                </Label>
+                <Textarea
+                  id={`items.${index}.specification`}
+                  name={`items.${index}.specification`}
+                  placeholder="Masukkan spesifikasi barang"
+                  value={item.specification}
+                  required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="min-h-[80px] resize-none w-full"
+                  disabled={isSubmitting}
+                />
+                {formik.touched.items?.[index]?.specification &&
+                  typeof formik.errors.items?.[index] === "object" &&
+                  formik.errors.items?.[index] !== null &&
+                  "specification" in formik.errors.items[index] && (
+                    <p className="text-destructive text-sm">
+                      {
+                        (formik.errors.items[index] as { specification?: string })
+                          .specification
+                      }
+                    </p>
+                  )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-3">
+                  <Label
+                    htmlFor={`items.${index}.quantity`}
+                    className="font-medium"
+                  >
+                    Jumlah
+                  </Label>
+                  <Input
+                    id={`items.${index}.quantity`}
+                    name={`items.${index}.quantity`}
+                    type="number"
+                    placeholder="Masukkan jumlah"
+                    value={item.quantity}
+                    required
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full"
+                    disabled={isSubmitting}
+                  />
+                  {formik.touched.items?.[index]?.quantity &&
+                    typeof formik.errors.items?.[index] === "object" &&
+                    formik.errors.items?.[index] !== null &&
+                    "quantity" in formik.errors.items[index] &&
+                    (
+                      <p className="text-destructive text-sm">
+                        {
+                          (formik.errors.items[index] as { quantity?: string })
+                            .quantity
+                        }
+                      </p>
+                    )}
+                </div>
+
+                <div className="grid gap-3">
+                  <Label htmlFor={`items.${index}.unit`} className="font-medium">
+                    Satuan
+                  </Label>
+                  <Input
+                    id={`items.${index}.unit`}
+                    name={`items.${index}.unit`}
+                    type="text"
+                    placeholder="Masukkan satuan (pcs, kg, dll)"
+                    value={item.unit}
+                    required
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full"
+                    disabled={isSubmitting}
+                  />
+                  {formik.touched.items?.[index]?.unit &&
+                    typeof formik.errors.items?.[index] === "object" &&
+                    formik.errors.items?.[index] !== null &&
+                    "unit" in formik.errors.items[index] && (
+                      <p className="text-destructive text-sm">
+                        {
+                          (formik.errors.items[index] as { unit?: string })
+                            .unit
+                        }
+                      </p>
+                    )}
+                </div>
+              </div>
+
+              {/* Tambahkan field description per item */}
+              <div className="grid gap-3">
+                <Label
+                  htmlFor={`items.${index}.description`}
+                  className="font-medium"
+                >
+                  Keterangan Barang
+                </Label>
+                <Textarea
+                  id={`items.${index}.description`}
+                  name={`items.${index}.description`}
+                  placeholder="Masukkan keterangan barang"
+                  value={item.description}
+                  required
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="min-h-[80px] resize-none w-full"
+                  disabled={isSubmitting}
+                />
+                {formik.touched.items?.[index]?.description &&
+                  typeof formik.errors.items?.[index] === "object" &&
+                  formik.errors.items?.[index] !== null &&
+                  "description" in formik.errors.items[index] && (
+                    <p className="text-destructive text-sm">
+                      {
+                        (formik.errors.items[index] as { description?: string })
+                          .description
+                      }
+                    </p>
+                  )}
+              </div>
+            </div>
+          ))}
         </div>
 
         <div className="flex items-center justify-end gap-4 pt-2">

@@ -7,6 +7,7 @@ import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import NextAuthProvider from "@/providers/NextAuthProvider";
 import TokenProvider from "@/providers/TokenProvider";
+import NuqsProvider from "@/providers/NuqsProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +37,9 @@ export default function RootLayout({
         <ReactQueryProvider>
           <StoreProvider>
             <NextAuthProvider>
-              <TokenProvider>{children}</TokenProvider>
+              <TokenProvider>
+                <NuqsProvider>{children}</NuqsProvider>
+              </TokenProvider>
             </NextAuthProvider>
           </StoreProvider>
         </ReactQueryProvider>

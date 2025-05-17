@@ -7,22 +7,33 @@ export type ProcurementStatus =
   | "COMPLEMENT"
   | "REJECTED";
 
-export interface Procurement {
+export type Department = "PURCHASE" | "FACTORY" | "OFFICE";
+
+export interface ProcurementItem {
   id: number;
-  username: string;
-  description: string;
-  status: ProcurementStatus;
-  note: string;
-  date: string;
-  department: "PURCHASE" | "FACTORY" | "OFFICE";
+  procurementId: number;
   itemName: string;
   specification: string;
   quantity: number;
   unit: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Procurement {
+  id: number;
+  userId: number;
+  username: string;
+  status: ProcurementStatus;
+  note: string | null;
+  date: string;
+  department: Department;
   trackingStatus: TrackingStatus;
   createdAt: string;
   updatedAt: string;
-  user: User
+  user?: User;
+  procurementItems?: ProcurementItem[];
 }
 
 export enum TrackingStatus {

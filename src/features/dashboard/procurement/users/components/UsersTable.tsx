@@ -60,6 +60,7 @@ import {
 import { ChevronDownIcon, FilterIcon, Loader2, Trash2 } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import RegisterModal from "./RegisterModal";
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 
 const ROLE_CONFIG = {
   USER: {
@@ -125,11 +126,14 @@ function DraggableRow({ row }: { row: Row<User> }) {
 }
 
 export function UsersTable() {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [queryParams, setQueryParams] = useQueryStates({
+    page: parseAsInteger.withDefault(1),
+    role: parseAsString.withDefault(""),
+  });
+
   const [pageSize] = useState(10);
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState({});
-  const [roleFilter, setRoleFilter] = useState("");
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [userToDelete, setUserToDelete] = useState<{
     id: number;
@@ -143,9 +147,9 @@ export function UsersTable() {
     isLoading,
     error,
   } = useGetUsers({
-    page: currentPage,
+    page: queryParams.page,
     take: pageSize,
-    role: roleFilter,
+    role: queryParams.role,
   });
 
   const deleteUserMutation = useDeleteUser();
@@ -192,6 +196,17 @@ export function UsersTable() {
 
   const handleRegisterSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ["users"] });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setQueryParams({ page: newPage });
+  };
+
+  const handleRoleFilter = (newRole: string) => {
+    setQueryParams({
+      role: newRole,
+      page: 1,
+    });
   };
 
   const columns: ColumnDef<User>[] = [
@@ -370,9 +385,10 @@ export function UsersTable() {
                   >
                     <FilterIcon className="h-4 w-4 mr-1.5" />
                     <span className="truncate">
-                      {roleFilter
-                        ? ROLE_CONFIG[roleFilter as keyof typeof ROLE_CONFIG]
-                            ?.label || roleFilter
+                      {queryParams.role
+                        ? ROLE_CONFIG[
+                            queryParams.role as keyof typeof ROLE_CONFIG
+                          ]?.label || queryParams.role
                         : "Peran"}
                     </span>
                     <ChevronDownIcon className="ml-1.5 h-4 w-4" />
@@ -380,10 +396,7 @@ export function UsersTable() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem
-                    onClick={() => {
-                      setRoleFilter("");
-                      setCurrentPage(1);
-                    }}
+                    onClick={() => handleRoleFilter("")}
                     className="cursor-pointer text-sm"
                   >
                     Semua Peran
@@ -391,10 +404,7 @@ export function UsersTable() {
                   {Object.entries(ROLE_CONFIG).map(([role, config]) => (
                     <DropdownMenuItem
                       key={role}
-                      onClick={() => {
-                        setRoleFilter(role);
-                        setCurrentPage(1);
-                      }}
+                      onClick={() => handleRoleFilter(role)}
                       className="flex items-center cursor-pointer text-sm"
                     >
                       <div
@@ -574,7 +584,7 @@ export function UsersTable() {
                 page={usersData.meta.page}
                 take={usersData.meta.take}
                 total={usersData.meta.total}
-                onChangePage={setCurrentPage}
+                onChangePage={handlePageChange}
               />
             </div>
           )}

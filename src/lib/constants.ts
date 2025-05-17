@@ -31,7 +31,7 @@ export const TRACKING_STATUS_CONFIG = {
   },
   MEMO_DIAJUKAN_ADMIN_PR: {
     color: "bg-blue-50 text-blue-700 border-blue-200",
-    label: "Memo Diajukan",
+    label: "Memo Dinaikan Admin PR",
   },
   APPROVAL_ATASAN_PERTAMA: {
     color: "bg-yellow-50 text-yellow-700 border-yellow-200",

@@ -55,7 +55,7 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] flex flex-col h-[90vh] sm:h-auto sm:max-h-[90vh] p-0 [&>button]:hidden">
+      <DialogContent className="sm:max-w-[700px] flex flex-col h-[90vh] sm:h-auto sm:max-h-[90vh] p-0 [&>button]:hidden">
         <DialogHeader className="p-6 pb-4 border-b shrink-0">
           <DialogTitle className="text-xl font-semibold">
             Detail Pengadaan
@@ -72,7 +72,12 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
             </div>
           ) : procurement ? (
             <div className="space-y-6 py-6">
+              {/* Informasi Umum */}
               <div className="space-y-4">
+                <h3 className="font-semibold text-lg text-gray-900 border-b pb-2">
+                  Informasi Umum
+                </h3>
+
                 <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
                   <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
                     <span>Nama</span>
@@ -97,62 +102,6 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
                   </div>
                 )}
 
-                {procurement.itemName && (
-                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
-                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
-                      <span>Nama Barang</span>
-                      <span>:</span>
-                    </div>
-                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
-                      {procurement.itemName}
-                    </div>
-                  </div>
-                )}
-
-                {procurement.specification && (
-                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-start">
-                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
-                      <span>Spesifikasi</span>
-                      <span>:</span>
-                    </div>
-                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
-                      {procurement.specification}
-                    </div>
-                  </div>
-                )}
-
-                {procurement.quantity && (
-                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
-                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
-                      <span>Jumlah</span>
-                      <span>:</span>
-                    </div>
-                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
-                      {procurement.quantity}
-                    </div>
-                  </div>
-                )}
-                {procurement.unit && (
-                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
-                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
-                      <span>Satuan</span>
-                      <span>:</span>
-                    </div>
-                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
-                      {procurement.unit}
-                    </div>
-                  </div>
-                )}
-                <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-start">
-                  <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
-                    <span>Keterangan</span>
-                    <span>:</span>
-                  </div>
-                  <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
-                    {procurement.description}
-                  </div>
-                </div>
-
                 <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
                   <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
                     <span>Status</span>
@@ -172,20 +121,70 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
                     {formatDate(procurement.date)}
                   </div>
                 </div>
+              </div>
 
-                {procurement.user?.email && (
-                  <div className="flex flex-col sm:grid sm:grid-cols-3 sm:items-center">
-                    <div className="font-medium text-gray-600 mb-1 sm:mb-0 sm:flex sm:justify-between sm:pr-2">
-                      <span>Email</span>
-                      <span>:</span>
-                    </div>
-                    <div className="text-gray-900 pl-4 sm:pl-0 sm:col-span-2">
-                      {procurement.user.email}
+              {/* Items Pengadaan */}
+              {procurement.procurementItems &&
+                procurement.procurementItems.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-lg text-gray-900 border-b pb-2">
+                      Items Pengadaan
+                    </h3>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="text-left px-4 py-2 border text-sm font-medium text-gray-700">
+                              No
+                            </th>
+                            <th className="text-left px-4 py-2 border text-sm font-medium text-gray-700">
+                              Nama Barang
+                            </th>
+                            <th className="text-left px-4 py-2 border text-sm font-medium text-gray-700">
+                              Spesifikasi
+                            </th>
+                            <th className="text-left px-4 py-2 border text-sm font-medium text-gray-700">
+                              Jumlah
+                            </th>
+                            <th className="text-left px-4 py-2 border text-sm font-medium text-gray-700">
+                              Satuan
+                            </th>
+                            <th className="text-left px-4 py-2 border text-sm font-medium text-gray-700">
+                              Keterangan
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {procurement.procurementItems.map((item, index) => (
+                            <tr key={item.id} className="hover:bg-gray-50">
+                              <td className="px-4 py-2 border text-sm text-gray-900">
+                                {index + 1}
+                              </td>
+                              <td className="px-4 py-2 border text-sm text-gray-900">
+                                {item.itemName}
+                              </td>
+                              <td className="px-4 py-2 border text-sm text-gray-900">
+                                {item.specification}
+                              </td>
+                              <td className="px-4 py-2 border text-sm text-gray-900">
+                                {item.quantity}
+                              </td>
+                              <td className="px-4 py-2 border text-sm text-gray-900">
+                                {item.unit}
+                              </td>
+                              <td className="px-4 py-2 border text-sm text-gray-900">
+                                {item.description}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 )}
-              </div>
 
+              {/* Catatan */}
               {procurement.note && (
                 <div className="space-y-3 pt-3 border-t">
                   <div className="text-sm font-medium text-gray-800">
