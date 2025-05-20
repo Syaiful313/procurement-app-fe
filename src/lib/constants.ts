@@ -10,7 +10,7 @@ export const STATUS_CONFIG = {
   URGENT: { color: "bg-red-50 text-red-700 border-red-200", label: "Mendesak" },
   COMPLEMENT: {
     color: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    label: "Melengkapi",
+    label: "Pelengkap",
   },
   REJECTED: {
     color: "bg-gray-50 text-gray-700 border-gray-200",
