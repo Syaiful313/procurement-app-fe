@@ -12,7 +12,11 @@ import {
 } from "@/components/ui/dialog";
 import useGetProcurementById from "@/hooks/api/dashboard-dirops/useGetProcurementById";
 import { DEPARTMENT_MAPPING, STATUS_CONFIG } from "@/lib/constants";
-import { Loader2 } from "lucide-react";
+import { Loader2, FileDown } from "lucide-react";
+
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
+import FormPermintaanBarang from "./FormPermintaanBarang";
 
 interface ModalDetailSectionProps {
   procurementId: number;
@@ -51,6 +55,24 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
         {config.label}
       </Badge>
     );
+  };
+
+  const generatePDF = async () => {
+    if (!procurement) return;
+
+    try {
+      const procurementForForm = {
+        ...procurement,
+        note: procurement.note === null ? undefined : procurement.note,
+      };
+      const blob = await pdf(
+        <FormPermintaanBarang data={procurementForForm} />
+      ).toBlob();
+      saveAs(blob, `form-pengadaan-barang-${procurement.id || "barang"}.pdf`);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Terjadi kesalahan saat membuat PDF");
+    }
   };
 
   return (
@@ -211,7 +233,17 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
           )}
         </div>
 
-        <DialogFooter className="p-6 pt-4 border-t shrink-0">
+        <DialogFooter className="p-6 pt-4 border-t shrink-0 flex flex-col sm:flex-row gap-3 items-center">
+          {procurement && (
+            <Button
+              onClick={generatePDF}
+              className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto flex items-center gap-2"
+            >
+              <FileDown className="h-4 w-4" />
+              Generate PDF
+            </Button>
+          )}
+
           <Button onClick={onClose} className="px-6 w-full sm:w-auto">
             Tutup
           </Button>
