@@ -4,11 +4,11 @@ export const STATUS_CONFIG = {
     label: "Menunggu Konfirmasi",
   },
   PRIORITAS: {
-    color: "bg-orange-50 text-orange-700 border-orange-200",
+    color: "bg-red-50 text-red-700 border-red-200",
     label: "Prioritas Tinggi",
   },
   URGENT: {
-    color: "bg-red-50 text-red-700 border-red-200",
+    color: "bg-orange-50 text-orange-700 border-orange-200",
     label: "Prioritas Sedang",
   },
   COMPLEMENT: {
