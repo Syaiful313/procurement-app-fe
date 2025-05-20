@@ -218,9 +218,9 @@ export function ProcurementsTable() {
     const mobileLabel =
       {
         WAITING_CONFIRMATION: "Menunggu",
-        PRIORITAS: "Prioritas",
-        URGENT: "Mendesak",
-        COMPLEMENT: "Melengkapi",
+        PRIORITAS: "Prioritas Tinggi",
+        URGENT: "Prioritas Sedang",
+        COMPLEMENT: "Prioritas Rendah",
         REJECTED: "Ditolak",
       }[status] || config.label;
 
