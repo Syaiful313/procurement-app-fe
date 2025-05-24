@@ -5,17 +5,17 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <div className="flex min-h-screen flex-col bg-white dark:bg-black">
+    <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
           <div className="container mx-auto max-w-screen-xl px-4 md:px-6">
             <div className="flex flex-col items-center space-y-8 text-center">
               <div className="space-y-4">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-black dark:text-white">
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
                   Sistem Pengadaan Barang
                 </h1>
-                <p className="mx-auto max-w-[700px] text-gray-600 md:text-xl dark:text-gray-400">
+                <p className="mx-auto max-w-[700px] md:text-xl">
                   Solusi terpadu untuk mengelola proses pengadaan barang secara
                   efisien dan transparan
                 </p>
@@ -24,7 +24,7 @@ export default function HomePage() {
                 <Link href="/login">
                   <Button
                     size="lg"
-                    className="min-w-[200px] bg-black hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black shadow-lg hover:shadow-xl transition-all duration-200"
+                    className="min-w-[200px] shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     Masuk ke Sistem
                   </Button>
@@ -33,7 +33,7 @@ export default function HomePage() {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="min-w-[200px] border-2 border-black dark:border-white hover:bg-gray-100 dark:hover:bg-gray-900"
+                    className="min-w-[200px]"
                   >
                     Pelajari Lebih Lanjut
                   </Button>
@@ -43,16 +43,16 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="w-full py-12 md:py-24 bg-gray-50 dark:bg-gray-950">
+        <section className="w-full py-12 md:py-24">
           <div className="container mx-auto max-w-screen-xl px-4 md:px-6">
-            <h2 className="text-2xl font-bold text-center mb-12 md:text-3xl text-black dark:text-white">
+            <h2 className="text-2xl font-bold text-center mb-12 md:text-3xl">
               Fitur Unggulan
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center space-y-4 p-6 rounded-lg bg-white dark:bg-black border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow duration-200">
-                <div className="w-16 h-16 mx-auto bg-black dark:bg-white rounded-full flex items-center justify-center">
+              <div className="text-center space-y-4 p-6 rounded-lg border hover:shadow-lg transition-shadow duration-200">
+                <div className="w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center">
                   <svg
-                    className="w-8 h-8 text-white dark:text-black"
+                    className="w-8 h-8 text-white"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -65,17 +65,17 @@ export default function HomePage() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-black dark:text-white">
+                <h3 className="text-xl font-semibold">
                   Proses Cepat
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p>
                   Percepat proses pengadaan dengan sistem yang terintegrasi
                 </p>
               </div>
-              <div className="text-center space-y-4 p-6 rounded-lg bg-white dark:bg-black border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow duration-200">
-                <div className="w-16 h-16 mx-auto bg-black dark:bg-white rounded-full flex items-center justify-center">
+              <div className="text-center space-y-4 p-6 rounded-lg border hover:shadow-lg transition-shadow duration-200">
+                <div className="w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center">
                   <svg
-                    className="w-8 h-8 text-white dark:text-black"
+                    className="w-8 h-8 text-white"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -88,17 +88,17 @@ export default function HomePage() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-black dark:text-white">
+                <h3 className="text-xl font-semibold">
                   Transparan
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p>
                   Pantau status pengadaan secara real-time
                 </p>
               </div>
-              <div className="text-center space-y-4 p-6 rounded-lg bg-white dark:bg-black border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow duration-200">
-                <div className="w-16 h-16 mx-auto bg-black dark:bg-white rounded-full flex items-center justify-center">
+              <div className="text-center space-y-4 p-6 rounded-lg border hover:shadow-lg transition-shadow duration-200">
+                <div className="w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center">
                   <svg
-                    className="w-8 h-8 text-white dark:text-black"
+                    className="w-8 h-8 text-white"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -111,10 +111,10 @@ export default function HomePage() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-black dark:text-white">
+                <h3 className="text-xl font-semibold">
                   Terkontrol
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p>
                   Kelola anggaran dan approval dengan mudah
                 </p>
               </div>

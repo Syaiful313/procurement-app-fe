@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { pdf } from '@react-pdf/renderer';
-import { saveAs } from 'file-saver';
-import FormPermintaanBarang from './FormPermintaanBarang';
+import React from "react";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
+import FormPermintaanBarang from "./FormPermintaanBarang";
 
 interface PDFGeneratorProps {
   data: any;
   filename?: string;
 }
 
-const PDFGenerator: React.FC<PDFGeneratorProps> = ({ 
-  data, 
-  filename = 'form-permintaan-barang.pdf' 
+const PDFGenerator: React.FC<PDFGeneratorProps> = ({
+  data,
+  filename = "form-permintaan-barang.pdf",
 }) => {
   const generatePDF = async () => {
     const blob = await pdf(<FormPermintaanBarang data={data} />).toBlob();
@@ -22,7 +22,7 @@ const PDFGenerator: React.FC<PDFGeneratorProps> = ({
   return (
     <button
       onClick={generatePDF}
-      className="bg-green-600 hover:bg-green-700 text-white rounded-md px-4 py-2 font-medium text-sm flex items-center gap-2"
+      className="rounded-md px-4 py-2 font-medium text-sm flex items-center gap-2"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

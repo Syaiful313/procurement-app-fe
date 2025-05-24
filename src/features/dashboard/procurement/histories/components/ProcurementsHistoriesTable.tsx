@@ -1,8 +1,17 @@
 "use client";
 import { DraggableRow } from "@/components/DraggableRow";
 import PaginationSection from "@/components/PaginationSection";
-import { StatusBadge } from "@/components/StatusBadge";
-import { TrackingStatusBadge } from "@/components/TrackingStatusBadge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,15 +29,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import useGetProcurements from "@/hooks/api/dashboard-dirops/useGetProcurements";
-import useUpdateProcurementStatus from "@/hooks/api/dashboard-dirops/useUpdateProcurementStatus";
-import useUpdateTrackingStatus from "@/hooks/api/dashboard-procurement/useUpdateTrackingStatus";
-import { DEPARTMENT_MAPPING, STATUS_CONFIG } from "@/lib/constants";
-import { formatDate } from "@/lib/dateFormatter";
+import useDeleteProcurement from "@/hooks/api/dashboard-procurement/useDeleteProcurement";
 import {
-  Procurement,
-  ProcurementStatus,
-  TrackingStatus,
-} from "@/types/procurement";
+  DEPARTMENT_MAPPING,
+  STATUS_CONFIG,
+  TRACKING_STATUS_CONFIG,
+} from "@/lib/constants";
+import { Procurement } from "@/types/procurement";
 import {
   DndContext,
   KeyboardSensor,
@@ -52,20 +59,11 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ChevronDownIcon,
-  Edit,
-  Eye,
-  FilterIcon,
-  TruckIcon,
-} from "lucide-react";
+import { ChevronDownIcon, FilterIcon, Trash2 } from "lucide-react";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import React, { useEffect, useMemo, useState } from "react";
-import ModalDetailSectionProcurement from "./ModalDetailProcurementSection";
-import ModalUpdateStatus from "./ModalUpdateStatus";
-import ModalUpdateTrackingStatus from "./ModalUpdateTrackingStatus";
 
-export function ProcurementsTable() {
+export function ProcurementsHistoriesTable() {
   const [queryParams, setQueryParams] = useQueryStates({
     page: parseAsInteger.withDefault(1),
     status: parseAsString.withDefault(""),
@@ -75,23 +73,13 @@ export function ProcurementsTable() {
   const [pageSize] = useState(10);
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState({});
-  const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [selectedProcurementId, setSelectedProcurementId] = useState<
-    number | null
-  >(null);
-  const [trackingModalOpen, setTrackingModalOpen] = useState(false);
-  const [selectedProcurementForTracking, setSelectedProcurementForTracking] =
-    useState<Procurement | null>(null);
-  const [selectedTrackingStatus, setSelectedTrackingStatus] = useState<
-    TrackingStatus | ""
-  >("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [procurementToDelete, setProcurementToDelete] = useState<number | null>(
+    null
+  );
 
-  const [statusModalOpen, setStatusModalOpen] = useState(false);
-  const [selectedProcurementForStatus, setSelectedProcurementForStatus] =
-    useState<Procurement | null>(null);
-  const [selectedProcurementStatus, setSelectedProcurementStatus] = useState<
-    ProcurementStatus | ""
-  >("");
+  const { mutate: deleteProcurement, isPending: isDeleting } =
+    useDeleteProcurement();
 
   const {
     data: procurementsData,
@@ -104,9 +92,6 @@ export function ProcurementsTable() {
     department: queryParams.department,
   });
 
-  const updateTrackingStatus = useUpdateTrackingStatus();
-  const updateProcurementStatus = useUpdateProcurementStatus();
-
   const [data, setData] = useState<Procurement[]>([]);
 
   useEffect(() => {
@@ -115,48 +100,75 @@ export function ProcurementsTable() {
     }
   }, [procurementsData]);
 
-  const handleOpenTrackingModal = (procurement: Procurement) => {
-    setSelectedProcurementForTracking(procurement);
-    setSelectedTrackingStatus(procurement.trackingStatus);
-    setTrackingModalOpen(true);
+  const openDeleteDialog = (id: number) => {
+    setProcurementToDelete(id);
+    setDeleteDialogOpen(true);
   };
 
-  const handleCloseTrackingModal = () => {
-    setTrackingModalOpen(false);
-    setSelectedProcurementForTracking(null);
-    setSelectedTrackingStatus("");
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setProcurementToDelete(null);
   };
 
-  const handleUpdateTrackingStatus = () => {
-    if (selectedProcurementForTracking && selectedTrackingStatus) {
-      updateTrackingStatus.mutate({
-        id: selectedProcurementForTracking.id,
-        trackingStatus: selectedTrackingStatus as TrackingStatus,
-      });
-      handleCloseTrackingModal();
+  const handleConfirmDelete = () => {
+    if (procurementToDelete !== null) {
+      deleteProcurement(procurementToDelete);
+      closeDeleteDialog();
     }
   };
 
-  const handleOpenStatusModal = (procurement: Procurement) => {
-    setSelectedProcurementForStatus(procurement);
-    setSelectedProcurementStatus(procurement.status as ProcurementStatus);
-    setStatusModalOpen(true);
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const isMobile = window.innerWidth < 640;
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: isMobile ? "numeric" : "short",
+      year: isMobile ? "2-digit" : "numeric",
+    });
   };
 
-  const handleCloseStatusModal = () => {
-    setStatusModalOpen(false);
-    setSelectedProcurementForStatus(null);
-    setSelectedProcurementStatus("");
+  const StatusBadge = ({ status }: { status: string }) => {
+    const config = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] || {
+      color: "",
+      label: status.replace(/_/g, " "),
+    };
+
+    const mobileLabel =
+      {
+        WAITING_CONFIRMATION: "Menunggu",
+        PRIORITAS: "Prioritas Tinggi",
+        URGENT: "Prioritas Sedang",
+        COMPLEMENT: "Prioritas Rendah",
+        REJECTED: "Ditolak",
+      }[status] || config.label;
+
+    return (
+      <Badge
+        variant="outline"
+        className={`px-1.5 sm:px-3 py-0.5 sm:py-1 font-medium text-[10px] sm:text-xs whitespace-nowrap ${config.color}`}
+      >
+        <span className="hidden sm:inline">{config.label}</span>
+        <span className="sm:hidden">{mobileLabel}</span>
+      </Badge>
+    );
   };
 
-  const handleUpdateProcurementStatus = () => {
-    if (selectedProcurementForStatus && selectedProcurementStatus) {
-      updateProcurementStatus.mutate({
-        id: selectedProcurementForStatus.id,
-        status: selectedProcurementStatus as ProcurementStatus,
-      });
-      handleCloseStatusModal();
-    }
+  const TrackingStatusBadge = ({ status }: { status: string }) => {
+    const config = TRACKING_STATUS_CONFIG[
+      status as keyof typeof TRACKING_STATUS_CONFIG
+    ] || {
+      color: "",
+      label: status.replace(/_/g, " "),
+    };
+
+    return (
+      <Badge
+        variant="outline"
+        className={`px-1.5 sm:px-3 py-0.5 sm:py-1 font-medium text-[10px] sm:text-xs whitespace-nowrap ${config.color}`}
+      >
+        <span>{config.label}</span>
+      </Badge>
+    );
   };
 
   const columns: ColumnDef<Procurement>[] = [
@@ -253,6 +265,7 @@ export function ProcurementsTable() {
         </div>
       ),
     },
+
     {
       id: "actions",
       header: () => (
@@ -261,49 +274,22 @@ export function ProcurementsTable() {
         </div>
       ),
       cell: ({ row }) => (
-        <div className="flex justify-center gap-1">
+        <div className="flex justify-center">
           <Button
             variant="ghost"
-            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-1 rounded-full h-6 w-6 sm:h-8 sm:w-8"
+            className="text-red-600 hover:text-red-800 hover:bg-red-50 p-1 rounded-full h-6 w-6 sm:h-8 sm:w-8"
             size="icon"
-            onClick={() => handleViewDetails(row.original.id)}
+            onClick={() => openDeleteDialog(row.original.id)}
+            disabled={isDeleting}
           >
-            <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="sr-only">Lihat detail</span>
-          </Button>
-          <Button
-            variant="ghost"
-            className="text-purple-600 hover:text-purple-800 hover:bg-purple-50 p-1 rounded-full h-6 w-6 sm:h-8 sm:w-8"
-            size="icon"
-            onClick={() => handleOpenStatusModal(row.original)}
-          >
-            <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="sr-only">Update status</span>
-          </Button>
-          <Button
-            variant="ghost"
-            className="text-green-600 hover:text-green-800 hover:bg-green-50 p-1 rounded-full h-6 w-6 sm:h-8 sm:w-8"
-            size="icon"
-            onClick={() => handleOpenTrackingModal(row.original)}
-          >
-            <TruckIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="sr-only">Update tracking</span>
+            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="sr-only">Hapus</span>
           </Button>
         </div>
       ),
       enableHiding: false,
     },
   ];
-
-  const handleViewDetails = (id: number) => {
-    setSelectedProcurementId(id);
-    setDetailModalOpen(true);
-  };
-
-  const handleCloseDetailModal = () => {
-    setDetailModalOpen(false);
-    setSelectedProcurementId(null);
-  };
 
   const sortableId = React.useId();
   const sensors = useSensors(
@@ -646,33 +632,30 @@ export function ProcurementsTable() {
         )}
       </div>
 
-      {selectedProcurementId && (
-        <ModalDetailSectionProcurement
-          procurementId={selectedProcurementId}
-          isOpen={detailModalOpen}
-          onClose={handleCloseDetailModal}
-        />
-      )}
-
-      <ModalUpdateTrackingStatus
-        isOpen={trackingModalOpen}
-        onClose={handleCloseTrackingModal}
-        procurement={selectedProcurementForTracking}
-        selectedTrackingStatus={selectedTrackingStatus}
-        onTrackingStatusChange={setSelectedTrackingStatus}
-        onUpdate={handleUpdateTrackingStatus}
-        isUpdating={updateTrackingStatus.isPending}
-      />
-
-      <ModalUpdateStatus
-        isOpen={statusModalOpen}
-        onClose={handleCloseStatusModal}
-        procurement={selectedProcurementForStatus}
-        selectedStatus={selectedProcurementStatus}
-        onStatusChange={setSelectedProcurementStatus}
-        onUpdate={handleUpdateProcurementStatus}
-        isUpdating={updateProcurementStatus.isPending}
-      />
+      {/* AlertDialog konfirmasi delete */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus procurement ini? Tindakan ini
+              tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={closeDeleteDialog}>
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Menghapus..." : "Hapus"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
