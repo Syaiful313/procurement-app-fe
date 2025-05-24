@@ -4,14 +4,14 @@ import { Package } from "lucide-react";
 
 const Navbar = () => {
   return (
-    <nav className="bg-white/95 dark:bg-black/95 supports-[backdrop-filter]:bg-white/90 dark:supports-[backdrop-filter]:bg-black/90 sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 backdrop-blur shadow-sm">
+    <nav className="sticky top-0 z-50 w-full border-b backdrop-blur shadow-sm">
       <div className="container mx-auto max-w-screen-xl flex h-16 items-center justify-between px-4 md:px-6">
         <div className="flex items-center">
           <Link href="/" className="flex items-center space-x-2">
             <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-md sm:h-10 sm:w-10">
               <Package className="h-5 w-5 text-white sm:h-6 sm:w-6" />
             </div>
-            <p className="text-xl md:text-2xl font-bold text-black dark:text-white">
+            <p className="text-xl md:text-2xl font-bold">
               Sabar App
             </p>
           </Link>
@@ -20,7 +20,7 @@ const Navbar = () => {
           <Link href="/">
             <Button
               variant="ghost"
-              className="hidden sm:inline-flex text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white"
+              className="hidden sm:inline-flex"
             >
               Fitur
             </Button>
@@ -28,13 +28,13 @@ const Navbar = () => {
           <Link href="/">
             <Button
               variant="ghost"
-              className="hidden sm:inline-flex text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white"
+              className="hidden sm:inline-flex"
             >
               Tentang
             </Button>
           </Link>
           <Link href="/login">
-            <Button className="bg-black hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black shadow-md hover:shadow-lg transition-all duration-200">
+            <Button className="shadow-md hover:shadow-lg transition-all duration-200">
               Login
             </Button>
           </Link>

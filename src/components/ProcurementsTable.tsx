@@ -77,7 +77,7 @@ function DraggableRow({
       }
       data-dragging={isDragging}
       ref={isEmptyRow ? undefined : setNodeRef}
-      className="relative border-b hover:bg-slate-50 data-[dragging=true]:z-10 data-[dragging=true]:bg-slate-100 data-[dragging=true]:opacity-90"
+      className="relative border-b data-[dragging=true]:z-10 data-[dragging=true]:opacity-90"
       style={{
         transform: CSS.Transform.toString(transform),
         transition: transition,
@@ -87,14 +87,14 @@ function DraggableRow({
         ? Array.from({ length: columnCount }).map((_, index) => (
             <TableCell
               key={`empty-cell-${index}`}
-              className="py-2 sm:py-3 px-2 sm:px-4 border-l border-r border-gray-200"
+              className="py-2 sm:py-3 px-2 sm:px-4 border-l border-r"
             >
               &nbsp;
             </TableCell>
           ))
         : row.getVisibleCells().map((cell: any) => {
             let cellClass =
-              "py-2 sm:py-3 px-2 sm:px-4 border-l border-r border-gray-200";
+              "py-2 sm:py-3 px-2 sm:px-4 border-l border-r";
 
             if (cell.column.id === "index")
               cellClass += " w-8 sm:w-12 text-xs sm:text-sm text-center";
@@ -181,7 +181,7 @@ export function ProcurementsTable() {
 
   const StatusBadge = ({ status }: { status: string }) => {
     const config = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] || {
-      color: "bg-gray-50 text-gray-600 border-gray-200",
+      color: "",
       label: status.replace(/_/g, " "),
     };
 
@@ -209,7 +209,7 @@ export function ProcurementsTable() {
     const config = TRACKING_STATUS_CONFIG[
       status as keyof typeof TRACKING_STATUS_CONFIG
     ] || {
-      color: "bg-gray-50 text-gray-600 border-gray-200",
+      color: "",
       label: status.replace(/_/g, " "),
     };
 
@@ -278,7 +278,7 @@ export function ProcurementsTable() {
 
         return (
           <div
-            className="text-left text-xs sm:text-sm text-gray-600 truncate"
+            className="text-left text-xs sm:text-sm truncate"
             title={displayDepartment}
           >
             {displayDepartment}
@@ -322,7 +322,7 @@ export function ProcurementsTable() {
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-center text-[10px] sm:text-sm text-gray-600">
+        <div className="text-center text-[10px] sm:text-sm">
           {formatDate(row.original.date)}
         </div>
       ),
@@ -566,7 +566,7 @@ export function ProcurementsTable() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-gray-200 shadow-sm overflow-hidden bg-white w-full">
+        <div className="rounded-lg border shadow-sm overflow-hidden w-full">
           <DndContext
             collisionDetection={closestCenter}
             modifiers={[restrictToVerticalAxis]}
@@ -576,15 +576,15 @@ export function ProcurementsTable() {
           >
             <div className="w-full overflow-x-auto">
               <Table className="w-full min-w-[650px]">
-                <TableHeader className="bg-gray-50">
+                <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow
                       key={headerGroup.id}
-                      className="border-b border-gray-200"
+                      className="border-b"
                     >
                       {headerGroup.headers.map((header) => {
                         let headerClass =
-                          "h-8 sm:h-10 px-2 sm:px-4 text-gray-700 border-l border-r border-gray-200";
+                          "h-8 sm:h-10 px-2 sm:px-4 border-l border-r";
 
                         if (header.id === "index")
                           headerClass += " w-8 sm:w-12";
@@ -634,11 +634,11 @@ export function ProcurementsTable() {
                     <TableRow>
                       <TableCell
                         colSpan={columns.length}
-                        className="h-24 text-center border-l border-r border-gray-200"
+                        className="h-24 text-center border-l border-r"
                       >
                         <div className="flex justify-center items-center">
                           <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-t-blue-500 rounded-full animate-spin"></div>
-                          <span className="ml-2 text-xs sm:text-sm text-gray-500">
+                          <span className="ml-2 text-xs sm:text-sm">
                             Memuat pengadaan...
                           </span>
                         </div>
@@ -648,7 +648,7 @@ export function ProcurementsTable() {
                     <TableRow>
                       <TableCell
                         colSpan={columns.length}
-                        className="h-24 text-center text-red-500 border-l border-r border-gray-200"
+                        className="h-24 text-center text-red-500 border-l border-r"
                       >
                         <div className="flex flex-col items-center gap-1">
                           <span className="text-sm">
@@ -687,7 +687,7 @@ export function ProcurementsTable() {
           </DndContext>
 
           {procurementsData?.meta && (
-            <div className="border-t border-gray-200 bg-gray-50 py-2 sm:py-3 px-3 sm:px-4">
+            <div className="border-t py-2 sm:py-3 px-3 sm:px-4">
               <PaginationSection
                 page={procurementsData.meta.page}
                 take={procurementsData.meta.take}

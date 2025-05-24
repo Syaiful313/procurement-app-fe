@@ -91,7 +91,7 @@ function DraggableRow({ row }: { row: Row<User> }) {
       data-state={row.getIsSelected() && "selected"}
       data-dragging={isDragging}
       ref={setNodeRef}
-      className="relative border-b hover:bg-slate-50 data-[dragging=true]:z-10 data-[dragging=true]:bg-slate-100 data-[dragging=true]:opacity-90"
+      className="relative border-b data-[dragging=true]:z-10 data-[dragging=true]:opacity-90"
       style={{
         transform: CSS.Transform.toString(transform),
         transition: transition,
@@ -164,7 +164,7 @@ export function UsersTable() {
 
   const RoleBadge = ({ role }: { role: string }) => {
     const config = ROLE_CONFIG[role as keyof typeof ROLE_CONFIG] || {
-      color: "bg-gray-50 text-gray-600 border-gray-200",
+      color: "",
       label: role,
     };
 
@@ -263,7 +263,7 @@ export function UsersTable() {
       ),
       cell: ({ row }) => (
         <div
-          className="text-left text-sm sm:text-sm text-gray-600 truncate"
+          className="text-left text-sm sm:text-sm truncate"
           title={row.original.password}
         >
           {row.original.password}
@@ -280,7 +280,7 @@ export function UsersTable() {
       ),
       cell: ({ row }) => (
         <div
-          className="text-left text-sm sm:text-sm text-gray-600 truncate"
+          className="text-left text-sm sm:text-sm truncate"
           title={row.original.email}
         >
           {row.original.email}
@@ -467,7 +467,7 @@ export function UsersTable() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-gray-200 shadow-sm overflow-hidden bg-white w-full">
+        <div className="rounded-lg border shadow-sm overflow-hidden w-full">
           <DndContext
             collisionDetection={closestCenter}
             modifiers={[restrictToVerticalAxis]}
@@ -480,15 +480,15 @@ export function UsersTable() {
               style={{ minHeight: "400px" }}
             >
               <Table className="w-full min-w-[700px]">
-                <TableHeader className="bg-gray-50">
+                <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow
                       key={headerGroup.id}
-                      className="border-b border-gray-200"
+                      className="border-b"
                     >
                       {headerGroup.headers.map((header) => {
                         let headerClass =
-                          "h-10 sm:h-10 px-2 sm:px-4 text-gray-700";
+                          "h-10 sm:h-10 px-2 sm:px-4";
 
                         if (header.id === "index")
                           headerClass += " w-10 sm:w-16";
@@ -532,7 +532,7 @@ export function UsersTable() {
                       >
                         <div className="flex justify-center items-center">
                           <div className="w-6 h-6 sm:w-6 sm:h-6 border-2 border-t-blue-500 rounded-full animate-spin"></div>
-                          <span className="ml-2 text-sm sm:text-sm text-gray-500">
+                          <span className="ml-2 text-sm sm:text-sm">
                             Memuat...
                           </span>
                         </div>
@@ -565,7 +565,7 @@ export function UsersTable() {
                     <TableRow>
                       <TableCell
                         colSpan={columns.length}
-                        className="h-24 text-center text-gray-500"
+                        className="h-24 text-center"
                       >
                         <span className="text-sm">
                           Tidak ada data pengguna ditemukan
@@ -579,7 +579,7 @@ export function UsersTable() {
           </DndContext>
 
           {usersData?.meta && (
-            <div className="border-t border-gray-200 bg-gray-50 py-3 sm:py-3 px-3 sm:px-4">
+            <div className="border-t py-3 sm:py-3 px-3 sm:px-4">
               <PaginationSection
                 page={usersData.meta.page}
                 take={usersData.meta.take}

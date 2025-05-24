@@ -12,10 +12,11 @@ import {
 } from "@/components/ui/dialog";
 import useGetProcurementById from "@/hooks/api/dashboard-dirops/useGetProcurementById";
 import { DEPARTMENT_MAPPING, STATUS_CONFIG } from "@/lib/constants";
-import { Loader2, FileDown } from "lucide-react";
+import { FileDown, Loader2 } from "lucide-react";
 
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
+import { useSession } from "next-auth/react";
 import FormPermintaanBarang from "./FormPermintaanBarang";
 
 interface ModalDetailSectionProps {
@@ -30,6 +31,7 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
   onClose,
 }) => {
   const { data: procurement, isLoading } = useGetProcurementById(procurementId);
+  const { data: session } = useSession();
 
   const formatDate = (dateString: string): string => {
     if (!dateString) return "-";
@@ -94,7 +96,6 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
             </div>
           ) : procurement ? (
             <div className="space-y-6 py-6">
-              {/* Informasi Umum */}
               <div className="space-y-4">
                 <h3 className="font-semibold text-lg text-gray-900 border-b pb-2">
                   Informasi Umum
@@ -145,7 +146,6 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
                 </div>
               </div>
 
-              {/* Items Pengadaan */}
               {procurement.procurementItems &&
                 procurement.procurementItems.length > 0 && (
                   <div className="space-y-4">
@@ -206,7 +206,6 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
                   </div>
                 )}
 
-              {/* Catatan */}
               {procurement.note && (
                 <div className="space-y-3 pt-3 border-t">
                   <div className="text-sm font-medium text-gray-800">
@@ -234,10 +233,10 @@ const ModalDetailSection: React.FC<ModalDetailSectionProps> = ({
         </div>
 
         <DialogFooter className="p-6 pt-4 border-t shrink-0 flex flex-col sm:flex-row gap-3 items-center">
-          {procurement && (
+          {procurement && (session?.user?.role as string) === "USER" && (
             <Button
               onClick={generatePDF}
-              className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto flex items-center gap-2"
+              className="w-full sm:w-auto flex items-center gap-2"
             >
               <FileDown className="h-4 w-4" />
               Generate PDF
