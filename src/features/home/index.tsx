@@ -8,9 +8,13 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
-          <div className="container mx-auto max-w-screen-xl px-4 md:px-6">
-            <div className="flex flex-col items-center space-y-8 text-center">
+        <section className="relative w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-[url('/gambarnsi.jpeg')] bg-no-repeat bg-cover bg-center h-[840px]">
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/55 z-10" />
+
+          {/* Content */}
+          <div className="relative z-20 container mx-auto max-w-screen-xl px-4 md:px-6">
+            <div className="flex flex-col items-center space-y-8 text-center text-white">
               <div className="space-y-4">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
                   Sistem Pengadaan Barang
@@ -33,7 +37,7 @@ export default function HomePage() {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="min-w-[200px]"
+                    className="min-w-[200px] text-black"
                   >
                     Pelajari Lebih Lanjut
                   </Button>
@@ -43,7 +47,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="w-full py-12 md:py-24">
+        <section className="relative z-20 -mt-40 w-full py-12 md:py-24 rounded-t-[45px] bg-white">
           <div className="container mx-auto max-w-screen-xl px-4 md:px-6">
             <h2 className="text-2xl font-bold text-center mb-12 md:text-3xl">
               Fitur Unggulan
@@ -65,12 +69,8 @@ export default function HomePage() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold">
-                  Proses Cepat
-                </h3>
-                <p>
-                  Percepat proses pengadaan dengan sistem yang terintegrasi
-                </p>
+                <h3 className="text-xl font-semibold">Proses Cepat</h3>
+                <p>Percepat proses pengadaan dengan sistem yang terintegrasi</p>
               </div>
               <div className="text-center space-y-4 p-6 rounded-lg border hover:shadow-lg transition-shadow duration-200">
                 <div className="w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center">
@@ -88,12 +88,8 @@ export default function HomePage() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold">
-                  Transparan
-                </h3>
-                <p>
-                  Pantau status pengadaan secara real-time
-                </p>
+                <h3 className="text-xl font-semibold">Transparan</h3>
+                <p>Pantau status pengadaan secara real-time</p>
               </div>
               <div className="text-center space-y-4 p-6 rounded-lg border hover:shadow-lg transition-shadow duration-200">
                 <div className="w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center">
@@ -111,12 +107,8 @@ export default function HomePage() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold">
-                  Terkontrol
-                </h3>
-                <p>
-                  Kelola anggaran dan approval dengan mudah
-                </p>
+                <h3 className="text-xl font-semibold">Terkontrol</h3>
+                <p>Kelola anggaran dan approval dengan mudah</p>
               </div>
             </div>
           </div>
